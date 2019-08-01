@@ -40,6 +40,7 @@ $transition-fade-height: 50px;
     box-shadow: black 0 -10px 10px 10px;
     display: flex;
     flex-direction: row;
+    z-index: 100;
 }
 
 .open-nav-button {
@@ -56,6 +57,8 @@ $transition-fade-height: 50px;
     z-index: 100;
     width: $nav-width;
     flex: 0 0 $nav-width;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (max-width: 768px) {
@@ -85,16 +88,30 @@ $transition-fade-height: 50px;
 
 .nav-header {
     height: $top-bar-height;
+    flex: 0 0 $top-bar-height;
     box-shadow: black 0 0 10px;
 }
 
+.nav-content{
+    flex: 1 0 0;
+}
+
 .content {
+    position: relative;
     height: 0;
     flex: 1 0 0;
 }
 
 a{
     text-decoration: none;
+}
+
+.course-name{
+    color: white;
+    text-align: center;
+    padding: 20px 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
 }
 
 .nav-link{
@@ -113,6 +130,44 @@ a{
     background-color: #FFF4;
 }
 
+.nav-folder{
+    .nav-folder-arrow{
+        padding: 0px;
+        margin: 0px;
+        float: right;
+        margin-top: -5px;
+        position: relative;
+        i{
+            position: absolute;
+            font-size: 30px;
+            right: 0px;
+            -webkit-transition: all 0.2s ease;
+            -moz-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+        .down{
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        .up{
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+    }
+}
+
+.nav-folder.open .nav-folder-arrow{
+    .down{
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    .up{
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
 .links-collapse{
     overflow: hidden;
     -webkit-transition: all 0.2s ease;
@@ -121,15 +176,15 @@ a{
     transition: all 0.2s ease;
     background-color: #0002;
     .top-shadow{
-        height: 20px;
-        margin-top: -20px;
+        height: 10px;
+        margin-top: -10px;
         width: 100%;
         //background-color: red;
         box-shadow: black 0 0 10px;
     }
     .bottom-shadow{
-        height: 20px;
-        margin-bottom: -20px;
+        height: 10px;
+        margin-bottom: -10px;
         width: 100%;
         //background-color: red;
         box-shadow: black 0 0 10px;
