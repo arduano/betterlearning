@@ -40,7 +40,7 @@ $transition-fade-height: 50px;
     box-shadow: black 0 -10px 10px 10px;
     display: flex;
     flex-direction: row;
-    z-index: 100;
+    z-index: 10;
 }
 
 .open-nav-button {
@@ -90,6 +90,7 @@ $transition-fade-height: 50px;
     height: $top-bar-height;
     flex: 0 0 $top-bar-height;
     box-shadow: black 0 0 10px;
+    z-index: 101;
 }
 
 .nav-content{

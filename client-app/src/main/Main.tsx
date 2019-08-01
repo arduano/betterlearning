@@ -41,11 +41,11 @@ class NavFolder extends React.Component<
     linksHeight: RefObject<HTMLDivElement>;
 
     render() {
-        let pages = this.props.pages.map(e => {
+        let pages = this.props.pages.map((e, i) => {
             if ((e as Page).url != null) {
                 e = e as Page;
                 return (
-                    <Link to={e.url}>
+                    <Link to={e.url} key={i}>
                         <div className="nav-link nav-child-link" onClick={() => { if (!this.props.parent.state.navHidden) this.props.parent.mobileToggleNav(this) }}>
                             {e.name}
                         </div>
@@ -108,11 +108,11 @@ export class Main extends React.Component<{}, MainStatePrivate>{
     NavLinks(props: { pages: (Page | PageFolder)[], parent: Main }) {
         return (
             <div>
-                {props.pages.map(e => {
+                {props.pages.map((e, i) => {
                     if ((e as Page).url != null) {
                         e = e as Page;
                         return (
-                            <Link to={e.url}>
+                            <Link to={e.url} key={i}>
                                 <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav(this) }}>
                                     {e.name}
                                 </div>
@@ -120,7 +120,7 @@ export class Main extends React.Component<{}, MainStatePrivate>{
                         );
                     }
                     else {
-                        return (<NavFolder pages={(e as PageFolder).pages} parent={props.parent} name={e.name} />)
+                        return (<NavFolder key={i} pages={(e as PageFolder).pages} parent={props.parent} name={e.name} />)
                     }
                 })}
             </div>
