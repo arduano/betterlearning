@@ -151,7 +151,7 @@ a{
             opacity: 1;
         }
         .up{
-            transform: translateY(-10px);
+            transform: translateY(10px);
             opacity: 0;
         }
     }
@@ -159,7 +159,7 @@ a{
 
 .nav-folder.open .nav-folder-arrow{
     .down{
-        transform: translateY(10px);
+        transform: translateY(-10px);
         opacity: 0;
     }
     .up{

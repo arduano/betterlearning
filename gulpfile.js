@@ -44,6 +44,10 @@ async function pRun(command) {
     await join(run)
 }
 
-gulp.task('client-start', () => {
-    pRun('cd client-app && npm start');
+gulp.task('client-start', async () => {
+    await pRun('cd client-app && npm start');
+});
+
+gulp.task('install', async () => {
+    await pRun('cd client-app && npm install');
 });
