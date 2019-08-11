@@ -1,0 +1,78 @@
+.main{
+    background-color: #252525;
+    width: 100vw;
+    height: 100vh;
+}
+
+.form-card{
+    background-color: #333;
+    position: absolute;
+    left: 300px;
+    top: 300px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px -2px black;
+    padding: 40px;
+}
+
+.text-box{
+    width: 100px;
+}
+
+h1{
+    margin: 0px;
+    text-align: center;
+}
+
+.label{
+    color: #888;
+}
+
+.form-item{
+    margin-top: 10px;
+}
+
+input.text{
+    font-size: 16px;
+    padding: 7px;
+    width: 300px;
+    background-color: #333;
+    border-color: #000;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    color: #AAA;
+    outline: none;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+input.text:focus{
+    border-color: #AAA;
+}
+
+textarea{
+    background-color: #222;
+    color: white;
+    border-radius: 5px;
+    resize: none; 
+    width: 300px;
+    font-size: 20px;
+    height: 1.5em;
+}
+
+.log-in{
+    outline: none;
+    width: 100%;
+    font-size: 16px;
+    padding: 5px;
+    background-color: #222;
+    color: #888;
+    border: none;
+    border-radius: 5px;
+}
+
+.log-in:active{
+    background-color: #333;
+}

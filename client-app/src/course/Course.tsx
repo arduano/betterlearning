@@ -1,5 +1,5 @@
 import React, { RefObject } from "react";
-import './Main.scss';
+import './Course.scss';
 import { Scroller } from "../scroller/Scroller";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import {
@@ -9,27 +9,133 @@ import {
     Link,
     Redirect
 } from "react-router-dom";
-import { WebApi } from "../utils/server-api";
+import { WebApi } from "../utils/ServerApi";
+import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
+import { AppState, AppStateConsumer } from "../utils/AppState";
+import { getGlobal } from 'reactn';
 
-interface PageFolder {
-    name: string,
-    pages: Page[],
+interface CourseStatePrivate extends CourseState {
+    navHidden: boolean
 }
 
-interface Page {
-    url: string,
-    name: string
-}
+type CourseProps = { ctx: AppState, match: { params: { id: string } } };
+export class Course extends React.Component<CourseProps, CourseStatePrivate > {
+    webapi: WebApi | null = null;
 
-export interface MainState {
-    pages: (Page | PageFolder)[],
-    courseName: string
+    constructor(props: CourseProps, state: CourseState) {
+        super(props)
+
+        this.state = {
+            pages: [],
+            navHidden: true,
+            courseName: '',
+            courseId: ''
+        };
+    }
+
+    componentWillMount() {
+
+    }
+
+    componentDidMount() {
+        this.webapi = new WebApi();
+        //console.log('state', )
+        //console.log('test', (this.context as AppState).testvar)
+
+        this.webapi.getCourse(this.props.match.params.id).then(pages => {
+            this.setState(pages);
+        });
+    }
+
+    mobileToggleNav(_: any) {
+        this.setState({ navHidden: !this.state.navHidden });
+    }
+
+    NavLinks(props: { pages: (NavPage | NavPageFolder)[], parent: Course }) {
+        return (
+            <div>
+                {props.pages.map((e, i) => {
+                    if ((e as NavPage).url != null) {
+                        e = e as NavPage;
+                        return (
+                            <Link to={e.url} key={i}>
+                                <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav(this) }}>
+                                    {e.name}
+                                </div>
+                            </Link>
+                        );
+                    }
+                    else {
+                        return (<NavFolder key={i} pages={(e as NavPageFolder).pages} parent={props.parent} name={e.name} />)
+                    }
+                })}
+            </div>
+        );
+    }
+
+    render() {
+        if (localStorage.getItem('token') == null) {
+            return (
+                <Redirect to="/login" />
+            )
+        }
+
+        return (
+            <Router>
+                <Route render={(location: any) => {
+                    location = location.location;
+                    return (
+                        <div className="main">
+                            <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
+                                <div className="nav-header">
+                                </div>
+                                <Scroller>
+                                    <div className="nav-content">
+                                        <div className='course-name'>{this.state.courseName}</div>
+                                        <this.NavLinks pages={this.state.pages} parent={this} />
+                                    </div>
+                                </Scroller>
+                            </div>
+                            <div className="right-content">
+                                <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={() => this.mobileToggleNav(this)}>
+                                </div>
+                                <div className="top-bar">
+                                    <div className="open-nav-button" onClick={() => this.mobileToggleNav(this)}>
+                                    </div>
+                                </div>
+                                <div className="content">
+                                    <div>
+                                        <div style={styles.content}>
+                                            <TransitionGroup>
+                                                <CSSTransition
+                                                    key={location.pathname}
+                                                    classNames="fade"
+                                                    timeout={400}
+                                                >
+                                                    <Switch location={location}>
+                                                        <Route exact path="/hsl/:h/:s/:l" component={HSL} />
+                                                        <Route exact path="/rgb/:r/:g/:b" component={RGB} />
+                                                        <Route exact path="/longpage" component={LongPage} />
+                                                        <Route render={() => <div>Not Found</div>} />
+                                                    </Switch>
+                                                </CSSTransition>
+                                            </TransitionGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }} />
+            </Router>
+        );
+    }
 }
 
 class NavFolder extends React.Component<
-    { pages: Page[], name: string, parent: Main },
+    { pages: NavPage[], name: string, parent: Course },
     { folded: boolean, unfoldHeight: number }>{
-    constructor(props: { pages: Page[], name: string, parent: Main }) {
+    constructor(props: { pages: NavPage[], name: string, parent: Course }) {
         super(props)
         this.state = {
             folded: true,
@@ -42,8 +148,8 @@ class NavFolder extends React.Component<
 
     render() {
         let pages = this.props.pages.map((e, i) => {
-            if ((e as Page).url != null) {
-                e = e as Page;
+            if ((e as NavPage).url != null) {
+                e = e as NavPage;
                 return (
                     <Link to={e.url} key={i}>
                         <div className="nav-link nav-child-link" onClick={() => { if (!this.props.parent.state.navHidden) this.props.parent.mobileToggleNav(this) }}>
@@ -81,119 +187,6 @@ class NavFolder extends React.Component<
         else
             this.setState({ unfoldHeight: 0 });
     }
-}
-
-interface MainStatePrivate extends MainState {
-    navHidden: boolean
-}
-
-export class Main extends React.Component<{}, MainStatePrivate>{
-    constructor(props: {}, state: MainState) {
-        super(props)
-        this.state = {
-            pages: [],
-            navHidden: true,
-            courseName: ''
-        };
-        WebApi.getNavPages().then(pages => {
-            setTimeout(() => this.setState(pages), 2000);
-
-        });
-    }
-
-    mobileToggleNav(_: any) {
-        this.setState({ navHidden: !this.state.navHidden });
-    }
-
-    NavLinks(props: { pages: (Page | PageFolder)[], parent: Main }) {
-        return (
-            <div>
-                {props.pages.map((e, i) => {
-                    if ((e as Page).url != null) {
-                        e = e as Page;
-                        return (
-                            <Link to={e.url} key={i}>
-                                <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav(this) }}>
-                                    {e.name}
-                                </div>
-                            </Link>
-                        );
-                    }
-                    else {
-                        return (<NavFolder key={i} pages={(e as PageFolder).pages} parent={props.parent} name={e.name} />)
-                    }
-                })}
-            </div>
-        );
-    }
-
-    render() {
-        return (
-            <Router>
-                <Route render={(location: any) => {
-                    location = location.location;
-                    return (
-                        <div className="main">
-                            <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
-                                <div className="nav-header">
-                                </div>
-                                <Scroller>
-                                    <div className="nav-content">
-                                        <div className='course-name'>{this.state.courseName}</div>
-                                        <this.NavLinks pages={this.state.pages} parent={this} />
-                                    </div>
-                                </Scroller>
-                            </div>
-                            <div className="right-content">
-                                <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={() => this.mobileToggleNav(this)}>
-                                </div>
-                                <div className="top-bar">
-                                    <div className="open-nav-button" onClick={() => this.mobileToggleNav(this)}>
-                                    </div>
-                                </div>
-                                <div className="content">
-                                    <div>
-                                        <div style={styles.content}>
-                                            <TransitionGroup>
-                                                {/* no different than other usage of
-                                                    CSSTransition, just make sure to pass
-                                                    `location` to `Switch` so it can match
-                                                    the old location as it animates out
-                                                */}
-                                                <CSSTransition
-                                                    key={location.pathname}
-                                                    classNames="fade"
-                                                    timeout={400}
-                                                >
-                                                    <Switch location={location}>
-                                                        <Route exact path="/hsl/:h/:s/:l" component={HSL} />
-                                                        <Route exact path="/rgb/:r/:g/:b" component={RGB} />
-                                                        <Route exact path="/longpage" component={LongPage} />
-                                                        {/* Without this `Route`, we would get errors during
-                                                            the initial transition from `/` to `/hsl/10/90/50`
-                                                        */}
-                                                        <Route render={() => <div>Not Found</div>} />
-                                                    </Switch>
-                                                </CSSTransition>
-                                            </TransitionGroup>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }} />
-            </Router>
-        );
-    }
-}
-
-function NavLink(props: any) {
-    return (
-        <li style={styles.navItem}>
-            <Link {...props} style={{ color: "inherit" }} />
-        </li>
-    );
 }
 
 function HSL({ match: { params } }: any) {
