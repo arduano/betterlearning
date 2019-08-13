@@ -12,7 +12,7 @@ export class Courses {
                     (pid1 as any).pages.forEach(pid2 => {
                         let page = DB.Pages.find(p => p.id == pid2)
                         if (page != null) {
-                            subpages.push({ name: page.name, url: page.url });
+                            subpages.push({ name: page.name, id: page.id });
                         }
                     });
                     pages.push({ name: (pid1 as any).name, pages: subpages });
@@ -20,7 +20,7 @@ export class Courses {
                 else {
                     let page = DB.Pages.find(p => p.id == pid1)
                     if (page != null) {
-                        pages.push({ name: page.name, url: page.url });
+                        pages.push({ name: page.name, id: page.id });
                     }
                 }
             });

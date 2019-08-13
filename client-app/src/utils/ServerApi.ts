@@ -4,6 +4,7 @@ import { LoggedInUserInfo } from '../../../shared-objects/UserInfo';
 import React from 'react';
 import { getGlobal } from 'reactn';
 import axios from 'axios';
+import { PageData } from '../../../shared-objects/PageData';
 
 export class WebApi {
     static urlBase = 'http://localhost:8080/';
@@ -11,7 +12,6 @@ export class WebApi {
     user: any = getGlobal<LoggedInUserInfo>();
 
     constructor() {
-        console.log(this.user);
     }
 
     getAuthHeaders() {
@@ -29,5 +29,8 @@ export class WebApi {
         return response.data as CourseState;
     }
 
-    
+    async getPage(cid: string, pid: string){
+        let response = await axios.get(WebApi.urlBase + `api1/page/${cid}/${pid}`, { headers: this.getAuthHeaders() });
+        return response.data as PageData;
+    }    
 }

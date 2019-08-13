@@ -13,14 +13,18 @@ import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
 import { AppState, AppStateConsumer } from "../utils/AppState";
 import { getGlobal } from 'reactn';
+import { PageWrapper } from "../pages/PageWrapper";
+import { PageData } from "../../../shared-objects/PageData";
 
 interface CourseStatePrivate extends CourseState {
     navHidden: boolean
 }
 
 type CourseProps = { ctx: AppState, match: { params: { id: string } } };
-export class Course extends React.Component<CourseProps, CourseStatePrivate > {
+export class Course extends React.Component<CourseProps, CourseStatePrivate> {
     webapi: WebApi | null = null;
+
+    pageQueries: any = {};
 
     constructor(props: CourseProps, state: CourseState) {
         super(props)
@@ -31,35 +35,64 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate > {
             courseName: '',
             courseId: ''
         };
+        this.mobileToggleNav = this.mobileToggleNav.bind(this);
+        this.PageFeeder = this.PageFeeder.bind(this);
+
+        this.webapi = new WebApi();
+
+        this.webapi.getCourse(this.props.match.params.id).then(state => {
+            //Request all pages in nav
+            state.pages.forEach(page => {
+                if ((page as NavPage).id == null) {
+                    (page as NavPageFolder).pages.forEach(page2 => {
+                        let id = (page2 as NavPage).id;
+                        if (this.webapi != null)
+                            if (this.pageQueries[id] == null) {
+                                this.pageQueries[id] = this.webapi.getPage(this.props.match.params.id, id);
+                            }
+                    });
+                }
+                else {
+                    let id = (page as NavPage).id;
+                    if (this.webapi != null)
+                        if (this.pageQueries[id] == null) {
+                            this.pageQueries[id] = this.webapi.getPage(this.props.match.params.id, id);
+                        }
+                }
+            });
+
+            this.setState(state);
+        });
     }
+
 
     componentWillMount() {
 
     }
 
     componentDidMount() {
-        this.webapi = new WebApi();
-        //console.log('state', )
-        //console.log('test', (this.context as AppState).testvar)
 
-        this.webapi.getCourse(this.props.match.params.id).then(pages => {
-            this.setState(pages);
-        });
     }
 
-    mobileToggleNav(_: any) {
+    mobileToggleNav() {
         this.setState({ navHidden: !this.state.navHidden });
+    }
+
+    PageFeeder(props: { match: { params: { pageid: string } } }) {
+        let data = this.pageQueries[props.match.params.pageid];
+        if (data == null) return <div></div>
+        return <div style={{height: "100%"}}><PageWrapper data={this.pageQueries[props.match.params.pageid]} /></div>
     }
 
     NavLinks(props: { pages: (NavPage | NavPageFolder)[], parent: Course }) {
         return (
             <div>
                 {props.pages.map((e, i) => {
-                    if ((e as NavPage).url != null) {
+                    if ((e as NavPage).id != null) {
                         e = e as NavPage;
                         return (
-                            <Link to={e.url} key={i}>
-                                <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav(this) }}>
+                            <Link to={e.id} key={i}>
+                                <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav() }}>
                                     {e.name}
                                 </div>
                             </Link>
@@ -97,31 +130,25 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate > {
                                 </Scroller>
                             </div>
                             <div className="right-content">
-                                <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={() => this.mobileToggleNav(this)}>
+                                <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={this.mobileToggleNav}>
                                 </div>
                                 <div className="top-bar">
-                                    <div className="open-nav-button" onClick={() => this.mobileToggleNav(this)}>
+                                    <div className="open-nav-button" onClick={this.mobileToggleNav}>
                                     </div>
                                 </div>
                                 <div className="content">
-                                    <div>
-                                        <div style={styles.content}>
-                                            <TransitionGroup>
-                                                <CSSTransition
-                                                    key={location.pathname}
-                                                    classNames="fade"
-                                                    timeout={400}
-                                                >
-                                                    <Switch location={location}>
-                                                        <Route exact path="/hsl/:h/:s/:l" component={HSL} />
-                                                        <Route exact path="/rgb/:r/:g/:b" component={RGB} />
-                                                        <Route exact path="/longpage" component={LongPage} />
-                                                        <Route render={() => <div>Not Found</div>} />
-                                                    </Switch>
-                                                </CSSTransition>
-                                            </TransitionGroup>
-                                        </div>
-                                    </div>
+                                    <TransitionGroup>
+                                        <CSSTransition
+                                            key={location.pathname}
+                                            classNames="fade"
+                                            timeout={400}
+                                        >
+                                            <Switch location={location}>
+                                                <Route exact path="/course/:courseid/:pageid" component={this.PageFeeder} />
+                                                <Route render={() => <div>Not Found</div>} />
+                                            </Switch>
+                                        </CSSTransition>
+                                    </TransitionGroup>
                                 </div>
                             </div>
                         </div>
@@ -148,11 +175,11 @@ class NavFolder extends React.Component<
 
     render() {
         let pages = this.props.pages.map((e, i) => {
-            if ((e as NavPage).url != null) {
+            if ((e as NavPage).id != null) {
                 e = e as NavPage;
                 return (
-                    <Link to={e.url} key={i}>
-                        <div className="nav-link nav-child-link" onClick={() => { if (!this.props.parent.state.navHidden) this.props.parent.mobileToggleNav(this) }}>
+                    <Link to={e.id} key={i}>
+                        <div className="nav-link nav-child-link" onClick={() => { if (!this.props.parent.state.navHidden) this.props.parent.mobileToggleNav() }}>
                             {e.name}
                         </div>
                     </Link>
@@ -188,84 +215,3 @@ class NavFolder extends React.Component<
             this.setState({ unfoldHeight: 0 });
     }
 }
-
-function HSL({ match: { params } }: any) {
-    return (
-        <div
-            style={{
-                ...styles.fill,
-                ...styles.hsl,
-                background: `hsl(${params.h}, ${params.s}%, ${params.l}%)`
-            }}
-        >
-            hsl(
-        {params.h}, {params.s}
-            %, {params.l}
-            %)
-      </div>
-    );
-}
-
-function RGB({ match: { params } }: any) {
-    return (
-        <div
-            style={{
-                ...styles.fill,
-                ...styles.rgb,
-                background: `rgb(${params.r}, ${params.g}, ${params.b})`
-            }}
-        >
-            rgb(
-        {params.r}, {params.g}, {params.b})
-      </div>
-    );
-}
-
-function LongPage({ match: { params } }: any) {
-    let lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    let lines = lipsum.split(' ').map(l => (<h1>{l}</h1>));
-
-    return (
-        <div style={styles.fill}>
-            <Scroller>
-                <h1>{lines}</h1>
-            </Scroller>
-        </div>
-    );
-}
-
-const styles: any = {};
-
-styles.fill = {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-};
-
-styles.content = {
-    ...styles.fill,
-    textAlign: "center"
-};
-
-styles.navItem = {
-    textAlign: "center",
-    flex: 1,
-    listStyleType: "none",
-    padding: "10px"
-};
-
-styles.hsl = {
-    ...styles.fill,
-    color: "white",
-    paddingTop: "20px",
-    fontSize: "30px"
-};
-
-styles.rgb = {
-    ...styles.fill,
-    color: "white",
-    paddingTop: "20px",
-    fontSize: "30px"
-};

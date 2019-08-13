@@ -1,6 +1,5 @@
-export interface Page{
-    id: string,
-    name: string,
-    url: string,
-    content: any,
+import { PageData } from './../../../shared-objects/PageData';
+
+export interface Page extends PageData{
+    courseId: string
 }

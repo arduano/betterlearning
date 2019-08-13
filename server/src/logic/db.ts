@@ -11,7 +11,7 @@ const Users: User[] = [
         salt: 'hhhh',
         courses: [
             {
-                id: '12345',
+                id: '1234',
                 completedTasks: []
             }
         ]
@@ -24,7 +24,7 @@ const Users: User[] = [
         salt: 'jjjjj',
         courses: [
             {
-                id: '12345',
+                id: '1234',
                 completedTasks: []
             }
         ]
@@ -43,7 +43,7 @@ const Courses: Course[] = [
                 name: 'Folder',
                 pages: [
                     '2',
-                    '2',
+                    '3',
                     '1',
                 ]
             }
@@ -53,15 +53,24 @@ const Courses: Course[] = [
 const Pages: Page[] = [
     {
         id: '1',
+        courseId: '1234',
         name: 'Page 1',
-        url: 'p1',
-        content: '<h1>Page 1</h1>'
+        type: 'html',
+        data: { html: '<div><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1></div>' }
     },
     {
         id: '2',
+        courseId: '1234',
         name: 'Page 2',
-        url: 'p2',
-        content: '<h3>Page 2</h3>'
+        type: 'html',
+        data: { html: '<h3>Page 2</h3>' }
+    },
+    {
+        id: '3',
+        courseId: '1234',
+        name: 'Page 3',
+        type: 'html',
+        data: { html: '<html><head><style>div{background-color:red;}</style></head><body><div>test</div></body></html>' }
     }
 ]
 

@@ -103,6 +103,10 @@ $transition-fade-height: 50px;
     flex: 1 0 0;
 }
 
+.content > div{
+    height: 100%;
+}
+
 a{
     text-decoration: none;
 }
@@ -196,6 +200,11 @@ a{
     opacity: 0;
     transform: translateY($transition-fade-height);
     z-index: 1;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 
 .fade-enter.fade-enter-active {
@@ -204,9 +213,22 @@ a{
     transition: all 300ms ease-out;
 }
 
+.fade-enter-done{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
 .fade-exit {
     opacity: 1;
     transform: translateY(0);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 
 .fade-exit.fade-exit-active {

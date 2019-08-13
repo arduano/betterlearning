@@ -1,3 +1,4 @@
+import { Pages } from './logic/pages';
 import { Courses } from './logic/courses';
 import { DB } from './logic/db';
 import { LoggedInUserInfo } from '../../shared-objects/UserInfo'
@@ -5,6 +6,8 @@ import { CourseState, NavPage, NavPageFolder } from '../../shared-objects/Course
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import Authentication from './logic/authentication';
+import { User } from './models/User';
+import { PageData } from '../../shared-objects/PageData';
 
 const app = express();
 const port = 8080;
@@ -31,6 +34,7 @@ const auth = (req, res, next) => {
     req.user = user;
     next();
 }
+const reqUser = (req) => (req as any).user as User;
 
 app.get('/', (req, res) => {
     res.send('h');
@@ -72,6 +76,27 @@ app.post('/api1/user', (req, res) => {
     else
         res.status(403).send('Invalid Token');
 });
+
+//Takes course id, page id
+//Returns PageData
+app.get('/api1/page/:cid/:pid', auth, (req, res) => {
+    if(!reqUser(req).courses.find(c => c.id == req.params.cid)){
+        res.status(404).send('course not found in user\'s courses');
+        return;
+    }
+    let page = Pages.getPage(req.params.pid);
+    if(page.courseId != req.params.cid){
+        res.status(404).send('page not found on course');
+        return;
+    }
+    let p: PageData = {
+        name: page.name,
+        id: page.id,
+        type: page.type,
+        data: page.data
+    }
+    res.status(200).send(p);
+})
 
 app.listen(port, err => {
     if (err) {

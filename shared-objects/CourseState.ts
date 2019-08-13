@@ -4,7 +4,7 @@ export interface NavPageFolder {
 }
 
 export interface NavPage {
-    url: string,
+    id: string,
     name: string
 }
 
