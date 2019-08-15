@@ -3,7 +3,7 @@ interface PageReply {
     author: string,
     time: Date,
     content: string,
-    likes: number
+    likes: string[]
 }
 
 export interface PageComment extends PageReply {

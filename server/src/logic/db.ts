@@ -63,7 +63,7 @@ const Pages: Page[] = [
                 author: '1234',
                 content: 'test comment',
                 time: new Date(),
-                likes: 14,
+                likes: [],
                 replies: []
             },
             {
@@ -71,7 +71,7 @@ const Pages: Page[] = [
                 author: '1234',
                 content: 'hhhhhh',
                 time: new Date(),
-                likes: 9,
+                likes: [],
                 replies: []
             }
         ]
@@ -96,7 +96,7 @@ const Pages: Page[] = [
                 author: '1234',
                 content: 'test comment',
                 time: new Date(),
-                likes: 14,
+                likes: ['1234'],
                 replies: []
             },
             {
@@ -104,7 +104,7 @@ const Pages: Page[] = [
                 author: '5678',
                 content: 'hhhhhh',
                 time: new Date(),
-                likes: 9,
+                likes: [],
                 replies: []
             }
         ]

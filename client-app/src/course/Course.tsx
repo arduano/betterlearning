@@ -12,7 +12,7 @@ import {
 import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
 import { AppState } from "../utils/AppState";
-import { getGlobal } from 'reactn';
+import { useGlobal } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
 

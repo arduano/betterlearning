@@ -7,24 +7,12 @@ import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
 import { AppState } from "../utils/AppState";
 
 export const Courses = (props: {}) => {
-    const [userPromise, setUserPromise]: [Promise<LoggedInUserInfo> | null, any] = useState(null);
-    const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+    const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
     if (user == null) {
-        if (localStorage.getItem('token') == null) {
-            return <Redirect to="/login" />
-        }
-        else {
-            if (userPromise == null) {
-                setUserPromise(new WebApi().getMe().then(me => {
-                    setUser(me);
-                    setUserPromise(null);
-                }));
-            }
-
-            return <h1>Loading...</h1>
-        }
+        return null;
     }
+
 
     return (
         <div className="courseList">

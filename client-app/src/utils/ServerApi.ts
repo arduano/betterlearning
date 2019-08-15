@@ -4,7 +4,6 @@ import { AppState } from './AppState';
 import { CourseState } from '../../../shared-objects/CourseState';
 import { LoggedInUserInfo } from '../../../shared-objects/UserInfo';
 import React from 'react';
-import { useGlobal } from 'reactn';
 import axios from 'axios';
 import { PageData } from '../../../shared-objects/PageData';
 

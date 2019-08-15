@@ -55,7 +55,7 @@ export class Scroller extends React.Component<{}, scrollerState>{
             window.onmouseup = () => { this.setState({ dragging: false }) }
             window.onmousemove = (a) => { this.headDrag(a, this) }
             window.onresize = () => this.setCancelWidth(this);
-            
+
         }
     }
 

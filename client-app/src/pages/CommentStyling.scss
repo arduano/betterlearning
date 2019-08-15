@@ -39,11 +39,16 @@
 
 .like-button:hover{
     border: 1px solid gray;
-    background-color: #FFF2;
+    //background-color: #FFF2;
+}
+
+.like-button.liked{
+    background-color: #FFF2;    
 }
 
 .like-button:active{
-    
+    background-color: #FFF4;
+    transition: all 0.0s ease;
 }
 
 .thumb-up{

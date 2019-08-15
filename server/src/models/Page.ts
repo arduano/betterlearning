@@ -5,7 +5,7 @@ interface Reply{
     author: string,
     time: Date,
     content: string,
-    likes: number
+    likes: string[]
 }
 
 interface Comment extends Reply{
