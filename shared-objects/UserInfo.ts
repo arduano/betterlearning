@@ -1,5 +1,6 @@
 export interface UserInfo{
-    id: string;
+    id: string,
+    name: string,
 }
 
 export interface LoggedInUserInfo extends UserInfo{

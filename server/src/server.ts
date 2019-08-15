@@ -1,3 +1,6 @@
+import { UserInfo } from './../../shared-objects/UserInfo';
+import { Users } from './logic/users';
+import { PageComment } from '../../shared-objects/PageComment';
 import { Pages } from './logic/pages';
 import { Courses } from './logic/courses';
 import { DB } from './logic/db';
@@ -80,12 +83,12 @@ app.post('/api1/user', (req, res) => {
 //Takes course id, page id
 //Returns PageData
 app.get('/api1/page/:cid/:pid', auth, (req, res) => {
-    if(!reqUser(req).courses.find(c => c.id == req.params.cid)){
+    if (!reqUser(req).courses.find(c => c.id == req.params.cid)) {
         res.status(404).send('course not found in user\'s courses');
         return;
     }
     let page = Pages.getPage(req.params.pid);
-    if(page.courseId != req.params.cid){
+    if (page.courseId != req.params.cid) {
         res.status(404).send('page not found on course');
         return;
     }
@@ -96,6 +99,45 @@ app.get('/api1/page/:cid/:pid', auth, (req, res) => {
         data: page.data
     }
     res.status(200).send(p);
+})
+
+//Takes page id
+//Returns comments array
+app.get('/api1/comments/:pid', auth, (req, res) => {
+    let page = Pages.getPage(req.params.pid);
+    if (!reqUser(req).courses.find(c => c.id == page.courseId)) {
+        res.status(404).send('user doesn\'t have access to the course');
+        return;
+    }
+    let c: PageComment[] = page.comments;
+    res.status(200).send(c);
+})
+
+//Takes basic authentication with no extra data
+//Returns user's own data
+app.get('/api1/user/@me', auth, (req, res) => {
+    let user = reqUser(req);
+    let u: LoggedInUserInfo = {
+        id: user.id,
+        name: user.name,
+        courses: user.courses.map(c => c.id),
+    };
+    res.status(200).send(u);
+})
+
+//Takes user id
+//Returns basic user data
+app.get('/api1/user/:uid', auth, (req, res) => {
+    let user = Users.getUserByID(req.params.uid);
+    if (user == null) {
+        res.status(404).send('user not found');
+        return;
+    }
+    let u: UserInfo = {
+        id: user.id,
+        name: user.name
+    };
+    res.status(200).send(user);
 })
 
 app.listen(port, err => {

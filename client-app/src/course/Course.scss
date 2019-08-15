@@ -40,7 +40,7 @@ $transition-fade-height: 50px;
     box-shadow: black 0 -10px 10px 10px;
     display: flex;
     flex-direction: row;
-    z-index: 10;
+    z-index: 20;
 }
 
 .open-nav-button {
@@ -54,11 +54,13 @@ $transition-fade-height: 50px;
     height: 100vh;
     background-color: rgb(44, 44, 44);
     overflow: hidden;
-    z-index: 100;
+    z-index: 10;
     width: $nav-width;
     flex: 0 0 $nav-width;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    box-shadow: 0px 0px 5px black;
 }
 
 @media (max-width: 768px) {
@@ -69,6 +71,7 @@ $transition-fade-height: 50px;
         -o-transition: all 0.2s ease;
         transition: all 0.2s ease;
         left: -$nav-width;
+        z-index: 100;
     }
 
     .left-nav.nav-open {
@@ -89,7 +92,7 @@ $transition-fade-height: 50px;
 .nav-header {
     height: $top-bar-height;
     flex: 0 0 $top-bar-height;
-    box-shadow: black 0 0 10px;
+    box-shadow: black 0 0 5px;
     z-index: 101;
 }
 

@@ -12,19 +12,20 @@ import logo from './logo.svg';
 import './App.css';
 import { Scroller } from './scroller/Scroller';
 import { Course } from './course/Course';
-import { AppState, AppStateProvider } from './utils/AppState';
+import { AppState } from './utils/AppState';
 import { thisExpression } from '@babel/types';
 import { Login } from './login/Login';
 import { setGlobal } from 'reactn';
+import { Courses } from './courses/Courses';
 
-setGlobal({
-	user: null,
-
+setGlobal<AppState>({
+	signedInUser: null
 });
 
 class App extends React.Component {
 
 	componentWillUnmount() {
+
 	}
 
 	componentWillMount() {
@@ -33,18 +34,19 @@ class App extends React.Component {
 
 	render() {
 		return (
-				<div className="App">
-					<Router>
-						<Route render={(args: any) => {
-							return (
-								<Switch location={args.location}>
-									<Route exact path="/login" component={Login} />
-									<Route path="/course/:id" component={Course} />
-								</Switch>
-							)
-						}} />
-					</Router>
-				</div>
+			<div className="App">
+				<Router>
+					<Route render={(args: any) => {
+						return (
+							<Switch location={args.location}>
+								<Route exact path="/" component={Courses} />
+								<Route exact path="/login" component={Login} />
+								<Route path="/course/:id" component={Course} />
+							</Switch>
+						)
+					}} />
+				</Router>
+			</div>
 		);
 	}
 }

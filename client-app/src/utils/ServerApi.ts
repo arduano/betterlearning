@@ -1,15 +1,16 @@
+import { UserInfo } from './../../../shared-objects/UserInfo';
+import { PageComment } from './../../../shared-objects/PageComment';
 import { AppState } from './AppState';
 import { CourseState } from '../../../shared-objects/CourseState';
 import { LoggedInUserInfo } from '../../../shared-objects/UserInfo';
 import React from 'react';
-import { getGlobal } from 'reactn';
+import { useGlobal } from 'reactn';
 import axios from 'axios';
 import { PageData } from '../../../shared-objects/PageData';
 
 export class WebApi {
     static urlBase = 'http://localhost:8080/';
 
-    user: any = getGlobal<LoggedInUserInfo>();
 
     constructor() {
     }
@@ -29,8 +30,23 @@ export class WebApi {
         return response.data as CourseState;
     }
 
-    async getPage(cid: string, pid: string){
+    async getPage(cid: string, pid: string) {
         let response = await axios.get(WebApi.urlBase + `api1/page/${cid}/${pid}`, { headers: this.getAuthHeaders() });
         return response.data as PageData;
-    }    
+    }
+
+    async getComments(pid: string) {
+        let response = await axios.get(WebApi.urlBase + `api1/comments/${pid}`, { headers: this.getAuthHeaders() });
+        return response.data as PageComment[];
+    }
+
+    async getUser(uid: string) {
+        let response = await axios.get(WebApi.urlBase + `api1/user/${uid}`, { headers: this.getAuthHeaders() });
+        return response.data as UserInfo;
+    }
+
+    async getMe() {
+        let response = await axios.get(WebApi.urlBase + `api1/user/@me`, { headers: this.getAuthHeaders() });
+        return response.data as LoggedInUserInfo;
+    }
 }

@@ -1,5 +1,6 @@
 import { HTMLPageData } from "../../../shared-objects/PageData";
 import React, { CSSProperties, RefObject, createRef } from "react";
+import "./CommentStyling.scss";
 
 const iframeStyle: CSSProperties = {
     width: '100%',
@@ -21,7 +22,6 @@ export class HTMLPage extends React.Component<HTMLPageData, {}>{
         //this.shadowref.current.innerHTML = this.props.html;
         let shadow = this.shadowref.current.attachShadow({mode: 'closed'});
         shadow.innerHTML = this.props.html;
-        console.log('injected');
     }
 
     shadowLoaded(){

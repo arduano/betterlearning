@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
-import { AppState, AppStateConsumer } from "../utils/AppState";
+import { AppState } from "../utils/AppState";
 import { getGlobal } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
@@ -20,7 +20,7 @@ interface CourseStatePrivate extends CourseState {
     navHidden: boolean
 }
 
-type CourseProps = { ctx: AppState, match: { params: { id: string } } };
+type CourseProps = { match: { params: { id: string } } };
 export class Course extends React.Component<CourseProps, CourseStatePrivate> {
     webapi: WebApi | null = null;
 
@@ -37,6 +37,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         };
         this.mobileToggleNav = this.mobileToggleNav.bind(this);
         this.PageFeeder = this.PageFeeder.bind(this);
+        this.OpenFirstPage = this.OpenFirstPage.bind(this);
 
         this.webapi = new WebApi();
 
@@ -81,7 +82,27 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
     PageFeeder(props: { match: { params: { pageid: string } } }) {
         let data = this.pageQueries[props.match.params.pageid];
         if (data == null) return <div></div>
-        return <div style={{height: "100%"}}><PageWrapper data={this.pageQueries[props.match.params.pageid]} /></div>
+        return <div style={{ height: "100%" }}><PageWrapper data={this.pageQueries[props.match.params.pageid]} /></div>
+    }
+
+    OpenFirstPage(props: { match: { params: { courseid: string } } }) {
+        if (this.state.pages.length == 0 && this.state.courseId == '') return null;
+        let firstPage = '@default';
+        for (let i = 0; i < this.state.pages.length; i++) {
+            if ((this.state.pages[i] as NavPage).id == null) {
+                let folder = this.state.pages[i] as NavPageFolder;
+                if (folder.pages.length != 0) {
+                    firstPage = folder.pages[0].id;
+                    break;
+                }
+            }
+            else {
+                firstPage = (this.state.pages[i] as NavPage).id;
+                break;
+            }
+        }
+        console.log(this.state.pages);
+        return <Redirect to={`/course/${props.match.params.courseid}/${firstPage}`} />
     }
 
     NavLinks(props: { pages: (NavPage | NavPageFolder)[], parent: Course }) {
@@ -122,12 +143,14 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                             <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
                                 <div className="nav-header">
                                 </div>
-                                <Scroller>
-                                    <div className="nav-content">
-                                        <div className='course-name'>{this.state.courseName}</div>
-                                        <this.NavLinks pages={this.state.pages} parent={this} />
-                                    </div>
-                                </Scroller>
+                                <div className="nav-content">
+                                    <Scroller>
+                                        <div className="nav-content">
+                                            <div className='course-name'>{this.state.courseName}</div>
+                                            <this.NavLinks pages={this.state.pages} parent={this} />
+                                        </div>
+                                    </Scroller>
+                                </div>
                             </div>
                             <div className="right-content">
                                 <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={this.mobileToggleNav}>
@@ -144,6 +167,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                             timeout={400}
                                         >
                                             <Switch location={location}>
+                                                <Route exact path="/course/:courseid" component={this.OpenFirstPage} />
                                                 <Route exact path="/course/:courseid/:pageid" component={this.PageFeeder} />
                                                 <Route render={() => <div>Not Found</div>} />
                                             </Switch>

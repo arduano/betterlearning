@@ -1,10 +1,12 @@
 import React from 'react';
 import './Login.scss';
-import { AppState, AppStateConsumer } from '../utils/AppState';
+import { AppState } from '../utils/AppState';
 import { WebApi } from '../utils/ServerApi';
 import { Redirect } from 'react-router';
+import { LoggedInUserInfo } from '../../../shared-objects/UserInfo';
+import { useGlobal } from 'reactn';
 
-function _Login(props: { ctx: AppState }) {
+export function Login(props: { ctx: AppState }) {
     const [values, setValues] = React.useState({
         username: '',
         password: '',
@@ -12,6 +14,7 @@ function _Login(props: { ctx: AppState }) {
     });
 
     let webapi = new WebApi();
+    const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
     const setError = (err: string) => {
         setValues({ ...values, errorMessage: err });
@@ -26,7 +29,7 @@ function _Login(props: { ctx: AppState }) {
             var token = await webapi.login(values.username, values.password);
         }
         catch(error){
-            if(error.response.status == 403){
+            if(error.response != null && error.response.status == 403){
                 setError('Incorrect username/password');
                 return;
             }
@@ -70,14 +73,4 @@ function _Login(props: { ctx: AppState }) {
             </div>
         </div>
     );
-}
-
-export function Login(props: {}) {
-    return (
-        <AppStateConsumer>
-            {ctx => (
-                <_Login ctx={ctx} />
-            )}
-        </AppStateConsumer>
-    )
 }
