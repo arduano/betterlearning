@@ -18,6 +18,13 @@ export class WebApi {
         return { 'Authorization': 'Bearer ' + localStorage.getItem('token') };
     }
 
+    getPfpUrl(uid: string, size?: number){
+        if(size == null){
+            return WebApi.urlBase + 'api1/userpfp/' + uid;
+        }
+        return WebApi.urlBase + 'api1/userpfp/' + uid + '?size=' + size;
+    }
+
     //Returns token or throws error
     async login(name: string, pass: string) {
         let response = await axios.post(WebApi.urlBase + 'api1/login', { name, pass });
@@ -47,5 +54,15 @@ export class WebApi {
     async getMe() {
         let response = await axios.get(WebApi.urlBase + `api1/user/@me`, { headers: this.getAuthHeaders() });
         return response.data as LoggedInUserInfo;
+    }
+
+    async likeComment(pid: string, cid: string){
+        let response = await axios.put(WebApi.urlBase + `api1/likes/${pid}/${cid}`, null, { headers: this.getAuthHeaders() });
+        return response.data;
+    }
+
+    async unlikeComment(pid: string, cid: string){
+        let response = await axios.delete(WebApi.urlBase + `api1/likes/${pid}/${cid}`, { headers: this.getAuthHeaders() });
+        return response.data;
     }
 }

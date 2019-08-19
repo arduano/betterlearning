@@ -16,7 +16,7 @@ export const Courses = (props: {}) => {
 
     return (
         <div className="courseList">
-            {user.courses.map((c, i) => (<CourseTile courseid={c} key={i} />))}
+            {user.courses.map((c, i) => (<CourseTile courseid={c.id} key={i} />))}
         </div>
     )
 }

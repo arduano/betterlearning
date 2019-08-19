@@ -7,7 +7,8 @@
     width: 50px;
     height: 50px;
     margin: 10px 20px 20px 20px;
-    border-radius: 100px;
+    border-radius: 5px;
+    user-select: none;
 }
 
 .comment-content{
@@ -28,6 +29,7 @@
 }
 
 .like-button{
+    margin-top: 3px;
     display: flex;
     border: 1px solid transparent;
     border-radius: 3px;

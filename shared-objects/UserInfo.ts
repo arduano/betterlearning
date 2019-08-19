@@ -4,5 +4,12 @@ export interface UserInfo{
 }
 
 export interface LoggedInUserInfo extends UserInfo{
-    courses: string[]
+    courses: {
+        id: string,
+        admin: boolean,
+        completedTasks: {
+            id: string,
+            time: Date
+        }[]
+    }[]
 }

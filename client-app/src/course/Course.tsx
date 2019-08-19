@@ -15,6 +15,7 @@ import { AppState } from "../utils/AppState";
 import { useGlobal } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
+import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
 
 interface CourseStatePrivate extends CourseState {
     navHidden: boolean
@@ -38,6 +39,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         this.mobileToggleNav = this.mobileToggleNav.bind(this);
         this.PageFeeder = this.PageFeeder.bind(this);
         this.OpenFirstPage = this.OpenFirstPage.bind(this);
+        this.UserPfp = this.UserPfp.bind(this);
 
         this.webapi = new WebApi();
 
@@ -105,6 +107,13 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         return <Redirect to={`/course/${props.match.params.courseid}/${firstPage}`} />
     }
 
+    UserPfp(props: {}) {
+        const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+        if (this.webapi != null && user != null)
+            return <img className="main-user-pfp" src={this.webapi.getPfpUrl(user.id, 512)} />
+        return <div></div>
+    }
+
     NavLinks(props: { pages: (NavPage | NavPageFolder)[], parent: Course }) {
         return (
             <div>
@@ -156,7 +165,17 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                 <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={this.mobileToggleNav}>
                                 </div>
                                 <div className="top-bar">
-                                    <div className="open-nav-button" onClick={this.mobileToggleNav}>
+                                    <div className="left">
+                                        <div className="open-nav-button" onClick={this.mobileToggleNav}>
+                                        </div>
+                                    </div>
+                                    <div className="middle">
+                                    </div>
+                                    <div className="right">
+                                        <this.UserPfp />
+                                        <div className="profile-button">
+                                            <div>Profile</div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="content">

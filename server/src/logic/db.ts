@@ -9,9 +9,11 @@ const Users: User[] = [
         email: 'user1@mail.com',
         password: 'pass',
         salt: 'hhhh',
+        pfp: '/pfp/me.png',
         courses: [
             {
                 id: '1234',
+                admin: true,
                 completedTasks: []
             }
         ]
@@ -22,9 +24,11 @@ const Users: User[] = [
         email: 'user2@mail.com',
         password: 'pass',
         salt: 'jjjjj',
+        pfp: '/pfp/pfp.png',
         courses: [
             {
                 id: '1234',
+                admin: false,
                 completedTasks: []
             }
         ]
@@ -67,7 +71,7 @@ const Pages: Page[] = [
                 replies: []
             },
             {
-                id: '1',
+                id: '2',
                 author: '1234',
                 content: 'hhhhhh',
                 time: new Date(),
@@ -100,7 +104,7 @@ const Pages: Page[] = [
                 replies: []
             },
             {
-                id: '1',
+                id: '2',
                 author: '5678',
                 content: 'hhhhhh',
                 time: new Date(),

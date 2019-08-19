@@ -37,7 +37,6 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { 
                 let comments = null;
 
                 if (this.state.comments != null) {
-                    console.log(comments);
                     comments = this.state.comments.map((c, i) => {
                         if (this.state.data != null) {
                             return (
@@ -65,20 +64,43 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { 
 const CommentComponent = (props: { comment: PageComment, pageid: string }) => {
     const [author, setAuthor]: [UserInfo | null, any] = useState<UserInfo | null>(null);
     const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
-    //const [liked, setLike]: [boolean, any] = useState<boolean>(false);
+    const [liked, setLike]: [boolean, any] = useState<boolean>(false);
+    const webapi = new WebApi();
+
+    if (user != null) {
+        let _liked = props.comment.likes.includes(user.id);
+        if (_liked != liked)
+            setLike(_liked);
+    }
 
     if (author == null) {
-        new WebApi().getUser(props.comment.author).then(u => setAuthor(u));
+        webapi.getUser(props.comment.author).then(u => setAuthor(u));
     }
 
     const getDateString = (d: Date) => {
         d = new Date(d);
         return d.getDay() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds()
     }
+
+    const likeClicked = () => {
+        if (user != null) {
+            if (props.comment.likes.includes(user.id)) {
+                props.comment.likes.splice(props.comment.likes.indexOf(user.id), 1);
+                webapi.unlikeComment(props.pageid, props.comment.id)
+                setLike(false);
+            }
+            else {
+                props.comment.likes.push(user.id);
+                webapi.likeComment(props.pageid, props.comment.id)
+                setLike(true);
+            }
+        }
+    }
+
     return (
         <div className="comment-wrap">
             <div>
-                <img className="comment-pfp" src={"/pfp.png"} />
+                <img className="comment-pfp" src={author != null ? webapi.getPfpUrl(author.id, 256) : ''} />
             </div>
             <div className="comment-content">
                 <div className="comment-user">
@@ -88,7 +110,7 @@ const CommentComponent = (props: { comment: PageComment, pageid: string }) => {
                 <div>
                     {props.comment.content}
                 </div>
-                <div className={`like-button ${user != null && props.comment.likes.includes(user.id) ? 'liked' : ''}`}>
+                <div className={`like-button ${user != null && props.comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
                     <div className="like-count">{props.comment.likes.length}</div>
                     <div className="material-icons thumb-up">thumb_up</div>
                 </div>

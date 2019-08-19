@@ -40,7 +40,42 @@ $transition-fade-height: 50px;
     box-shadow: black 0 -10px 10px 10px;
     display: flex;
     flex-direction: row;
+    overflow: hidden;
     z-index: 20;
+    .left {
+        flex: none;
+    }
+    .middle {
+        flex: 1 1 auto;
+    }
+    .right {
+        flex: none;
+        display: flex;
+        cursor: pointer;
+        user-select: none;
+    }
+    .right .profile-button{
+        width: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        transition: all 0.15s ease-in-out;
+        font-size: 30px;
+        font-family: 'Roboto';
+        font-weight: 700px;
+        background-color: #FFF1;
+        color: white;
+    }
+    .right:hover .profile-button{
+        width: 150px;
+    }
+}
+
+.main-user-pfp {
+    width: $top-bar-height;
+    height: $top-bar-height;
+    //box-shadow: 0 0 10px black;
 }
 
 .open-nav-button {
@@ -96,7 +131,7 @@ $transition-fade-height: 50px;
     z-index: 101;
 }
 
-.nav-content{
+.nav-content {
     flex: 1 0 0;
 }
 
@@ -106,46 +141,46 @@ $transition-fade-height: 50px;
     flex: 1 0 0;
 }
 
-.content > div{
+.content > div {
     height: 100%;
 }
 
-a{
+a {
     text-decoration: none;
 }
 
-.course-name{
+.course-name {
     color: white;
     text-align: center;
     padding: 20px 20px;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 20px;
 }
 
-.nav-link{
+.nav-link {
     color: white;
     user-select: none;
     padding: 20px 30px;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 18px;
 }
 
-.nav-link:hover{
-    background-color: #FFF2;
+.nav-link:hover {
+    background-color: #fff2;
 }
 
-.nav-link:active{
-    background-color: #FFF4;
+.nav-link:active {
+    background-color: #fff4;
 }
 
-.nav-folder{
-    .nav-folder-arrow{
+.nav-folder {
+    .nav-folder-arrow {
         padding: 0px;
         margin: 0px;
         float: right;
         margin-top: -5px;
         position: relative;
-        i{
+        i {
             position: absolute;
             font-size: 30px;
             right: 0px;
@@ -154,43 +189,43 @@ a{
             -o-transition: all 0.2s ease;
             transition: all 0.2s ease;
         }
-        .down{
+        .down {
             transform: translateY(0px);
             opacity: 1;
         }
-        .up{
+        .up {
             transform: translateY(10px);
             opacity: 0;
         }
     }
 }
 
-.nav-folder.open .nav-folder-arrow{
-    .down{
+.nav-folder.open .nav-folder-arrow {
+    .down {
         transform: translateY(-10px);
         opacity: 0;
     }
-    .up{
+    .up {
         transform: translateY(0px);
         opacity: 1;
     }
 }
 
-.links-collapse{
+.links-collapse {
     overflow: hidden;
     -webkit-transition: all 0.2s ease;
     -moz-transition: all 0.2s ease;
     -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
     background-color: #0002;
-    .top-shadow{
+    .top-shadow {
         height: 10px;
         margin-top: -10px;
         width: 100%;
         //background-color: red;
         box-shadow: black 0 0 10px;
     }
-    .bottom-shadow{
+    .bottom-shadow {
         height: 10px;
         margin-bottom: -10px;
         width: 100%;
@@ -216,7 +251,7 @@ a{
     transition: all 300ms ease-out;
 }
 
-.fade-enter-done{
+.fade-enter-done {
     position: absolute;
     left: 0;
     right: 0;
