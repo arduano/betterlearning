@@ -6,7 +6,7 @@ import { Redirect } from 'react-router';
 import { LoggedInUserInfo } from '../../../shared-objects/UserInfo';
 import { useGlobal } from 'reactn';
 
-export function Login(props: { ctx: AppState }) {
+export function Login(props: {}) {
     const [values, setValues] = React.useState({
         username: '',
         password: '',
@@ -42,7 +42,7 @@ export function Login(props: { ctx: AppState }) {
     }
 
     if(localStorage.getItem('token') != null){
-        return <Redirect to='/'/>
+        return <Redirect to='/courses'/>
     }
 
     return (

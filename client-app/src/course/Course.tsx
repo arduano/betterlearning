@@ -16,9 +16,11 @@ import { useGlobal } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
+import MyProfile from "../profile/MyProfile";
 
 interface CourseStatePrivate extends CourseState {
-    navHidden: boolean
+    navHidden: boolean,
+    profileOpen: boolean
 }
 
 type CourseProps = { match: { params: { id: string } } };
@@ -34,12 +36,14 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
             pages: [],
             navHidden: true,
             courseName: '',
-            courseId: ''
+            courseId: '',
+            profileOpen: false
         };
         this.mobileToggleNav = this.mobileToggleNav.bind(this);
         this.PageFeeder = this.PageFeeder.bind(this);
         this.OpenFirstPage = this.OpenFirstPage.bind(this);
         this.UserPfp = this.UserPfp.bind(this);
+        this.renderMainView = this.renderMainView.bind(this);
 
         this.webapi = new WebApi();
 
@@ -136,13 +140,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         );
     }
 
-    render() {
-        if (localStorage.getItem('token') == null) {
-            return (
-                <Redirect to="/login" />
-            )
-        }
-
+    renderMainView() {
         return (
             <Router>
                 <Route render={(location: any) => {
@@ -171,7 +169,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                     </div>
                                     <div className="middle">
                                     </div>
-                                    <div className="right">
+                                    <div className="right" onClick={(() => this.setState({ profileOpen: true }))}>
                                         <this.UserPfp />
                                         <div className="profile-button">
                                             <div>Profile</div>
@@ -198,7 +196,32 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                     )
                 }} />
             </Router>
-        );
+        )
+    }
+
+    render() {
+        return (
+            <div className="fill">
+                <TransitionGroup>
+                    <CSSTransition
+                        key={this.state.profileOpen ? 1 : 0}
+                        classNames="zoom-fade"
+                        timeout={400}
+                    >
+                        {
+                            (() => {
+                                if (this.state.profileOpen) return (
+                                    <div className="profile-view">
+                                        <MyProfile onCloseClicked={(() => this.setState({ profileOpen: false }))} />
+                                    </div>
+                                )
+                                return <div className="courses-view">{this.renderMainView()}</div>;
+                            })()
+                        }
+                    </CSSTransition>
+                </TransitionGroup>
+            </div>
+        )
     }
 }
 

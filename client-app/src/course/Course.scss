@@ -234,6 +234,16 @@ a {
     }
 }
 
+.fill{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    background-color: #444;
+}
+
 .fade-enter {
     opacity: 0;
     transform: translateY($transition-fade-height);
@@ -273,4 +283,60 @@ a {
     opacity: 0;
     transform: translateY(-$transition-fade-height);
     transition: all 300ms ease-out;
+}
+
+
+.zoom-fade-enter {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.zoom-fade-enter.profile-view{
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.zoom-fade-enter.courses-view{
+    transform: scale(0.9);
+    z-index: 0;
+}
+
+.zoom-fade-enter.zoom-fade-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 300ms ease-in-out;
+}
+
+.zoom-fade-enter-done {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.zoom-fade-exit {
+    opacity: 1;
+    transform: scale(1);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.zoom-fade-exit.zoom-fade-exit-active.profile-view {
+    opacity: 0;
+    transform: scale(1.1);
+    transition: all 300ms ease-in-out;
+}
+
+.zoom-fade-exit.zoom-fade-exit-active.courses-view {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 300ms ease-in-out;
 }

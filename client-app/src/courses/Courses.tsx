@@ -9,10 +9,10 @@ import { AppState } from "../utils/AppState";
 export const Courses = (props: {}) => {
     const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
+    console.log('asdf', user)
     if (user == null) {
         return null;
     }
-
 
     return (
         <div className="courseList">
