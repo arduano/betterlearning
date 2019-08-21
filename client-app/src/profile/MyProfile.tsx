@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobal } from 'reactn';
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
 import { AppState } from "../utils/AppState";
@@ -31,6 +31,22 @@ const Settings = {
     }
 }
 
+function PageWrap(props: { name: string, children: any, backClicked: () => void }) {
+    return (
+        <div>
+            <div className="page-mobile-title">
+                <div onClick={props.backClicked} className="page-mobile-back-button">
+
+                </div>
+                <div>{props.name}</div>
+            </div>
+            <Scroller>
+                {props.children}
+            </Scroller>
+        </div>
+    )
+}
+
 export default function MyProfile(props: { onCloseClicked: () => void }) {
     const [currPage, setCurrPage]: [Pages, any] = useState<Pages>(Pages.None);
     function Link(props: { children: any, to: Pages }) {
@@ -41,8 +57,13 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
         )
     }
 
+    const backClicked = () => {
+
+    }
+
     return (
-        <div className={`fill ${currPage == Pages.None ? 'none-selected' : 'page-selected'}`}>
+        <div
+            className={`fill ${currPage == Pages.None ? 'none-selected' : 'page-selected'}`}>
             <div className="profile-nav-side">
                 <Scroller>
                     <div className="profile-nav-bar">
@@ -69,8 +90,16 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
                         {
                             (() => {
                                 if (currPage == Pages.None) return <div></div>
-                                if (currPage == Pages.Account) return <Scroller><Settings.Account /></Scroller>
-                                if (currPage == Pages.Security) return <Scroller><Settings.Account /></Scroller>
+                                if (currPage == Pages.Account) return (
+                                    <PageWrap backClicked={() => setCurrPage(Pages.None)} name="Account">
+                                        <Settings.Account />
+                                    </PageWrap>
+                                )
+                                if (currPage == Pages.Security) return (
+                                    <PageWrap backClicked={() => setCurrPage(Pages.None)} name="Security">
+                                        <Settings.Account />
+                                    </PageWrap>
+                                )
                             })()
                         }
                     </CSSTransition>
