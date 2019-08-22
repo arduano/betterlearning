@@ -48,17 +48,21 @@ function PageWrap(props: { name: string, children: any, backClicked: () => void 
 }
 
 export default function MyProfile(props: { onCloseClicked: () => void }) {
-    const [currPage, setCurrPage]: [Pages, any] = useState<Pages>(Pages.None);
+    const [currPage, setCurrPage]: [Pages, any] = useState<Pages>(Pages.Account);
+    const [loaded, setLoaded]: [boolean, any] = useState<boolean>(false);
+
+    if(window.innerWidth < 768 && !loaded){
+        setCurrPage(Pages.None)
+    }
+
+    if(!loaded) setLoaded(true);
+
     function Link(props: { children: any, to: Pages }) {
         return (
             <div onClick={() => setCurrPage(props.to)} className={currPage == props.to ? 'active' : ''}>
                 {props.children}
             </div>
         )
-    }
-
-    const backClicked = () => {
-
     }
 
     return (
@@ -70,10 +74,10 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
                         <div className="profile-nav-bar-inner">
                             <div className="profile-nav-group-title">GENERAL</div>
                             <Link to={Pages.Account}>
-                                <div className="profile-nav-link">Account</div>
+                                <div className="profile-nav-link"><span className="material-icons">person</span>Account</div>
                             </Link>
                             <Link to={Pages.Security}>
-                                <div className="profile-nav-link">Security</div>
+                                <div className="profile-nav-link"><span className="material-icons">vpn_key</span>Security</div>
                             </Link>
                             <div className="profile-nav-link" onClick={(() => props.onCloseClicked())}>Back...</div>
                         </div>
@@ -85,7 +89,7 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
                     <CSSTransition
                         key={currPage}
                         classNames="profile-fade"
-                        timeout={400}
+                        timeout={10000}
                     >
                         {
                             (() => {

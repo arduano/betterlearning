@@ -1,6 +1,6 @@
 $transition-fade-height: 50px;
 
-.fill{
+.fill {
     width: 100vw;
     height: 100vh;
     background-color: #333;
@@ -8,68 +8,70 @@ $transition-fade-height: 50px;
     position: relative;
 }
 
-.profile-nav-side{
+.profile-nav-side {
     flex: 1 0 250px;
     background-color: #222;
 }
 
-.profile-nav-bar{
+.profile-nav-bar {
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
 }
 
-.profile-nav-bar-inner{
+.profile-nav-bar-inner {
     width: 250px;
     margin-right: 10px;
     margin-top: 50px;
 }
 
-.profile-nav-group-title{
-    font-family: 'Roboto';
+.profile-nav-group-title {
+    font-family: "Roboto";
     font-weight: 700;
     font-size: 14px;
     color: #888;
     padding-left: 10px;
 }
 
-.profile-nav-link{
+.profile-nav-link {
     font-size: 18px;
-    font-family: 'Roboto';
-    color: #AAA;
+    font-family: "Roboto";
+    color: #aaa;
     border-radius: 5px;
     padding: 5px;
     padding-left: 10px;
     margin: 2px;
     user-select: none;
     transition: all 0.1s ease-in-out;
+    .material-icons{
+        display: none;
+    }
 }
 
-.profile-nav-link:hover{
+.profile-nav-link:hover {
     background-color: #0004;
 }
 
-.profile-nav-link:active{
+.profile-nav-link:active {
     //transform: translateX(5px);
-    background-color: #FFF5;
+    background-color: #fff5;
 }
 
-.active .profile-nav-link{
-    background-color: #FFF3;    
+.active .profile-nav-link {
+    background-color: #fff3;
 }
 
-.profile-page{
+.profile-page {
     position: relative;
     height: 100%;
     flex: 1 1 1000px;
 }
 
-.page > div{
+.page > div {
     height: 100%;
 }
 
-.info-box{
-    
+.info-box {
 }
 
 .profile-fade-enter {
@@ -113,11 +115,12 @@ $transition-fade-height: 50px;
     transition: all 300ms ease-out;
 }
 
-.none-selected .profile-page{
-    display: none;
+.none-selected .profile-page {
+    //display: none;
+    pointer-events: none;
 }
 
-.page-mobile-title{
+.page-mobile-title {
     display: none;
     height: 60px;
     background-color: #333;
@@ -125,26 +128,47 @@ $transition-fade-height: 50px;
     z-index: 20;
 }
 
-.page-mobile-back-button{
-    width: 50px;
-    height: 50px;
+.page-mobile-back-button {
+    width: 60px;
+    height: 60px;
     background-color: #222;
 }
 
 @media (max-width: 768px) {
-    .profile-nav-side, .profile-page{
+    .profile-nav-side,
+    .profile-page {
         position: absolute;
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
     }
-    
-    .profile-page{
+
+    .profile-page {
         z-index: 10;
     }
 
-    .page-mobile-title{
-        display: block;
+    .page-mobile-title {
+        display: flex;
+    }
+
+    .profile-fade-exit.profile-fade-exit-active {
+        transform: translateY($transition-fade-height);
+    }
+
+    .profile-nav-bar-inner{
+        width: 100%;
+    }
+
+    .profile-nav-link{
+        padding: 15px;
+        width: 100%;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        .material-icons{
+            font-size: 25px;
+            margin-right: 7px;
+        }
     }
 }
