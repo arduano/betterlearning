@@ -1,5 +1,14 @@
 $transition-fade-height: 50px;
 
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .fill {
     width: 100vw;
     height: 100vh;
@@ -43,7 +52,7 @@ $transition-fade-height: 50px;
     margin: 2px;
     user-select: none;
     transition: all 0.1s ease-in-out;
-    .material-icons{
+    .material-icons {
         display: none;
     }
 }
@@ -67,7 +76,7 @@ $transition-fade-height: 50px;
     flex: 1 1 1000px;
 }
 
-.page-wrap{
+.page-wrap {
     max-width: 1000px;
 }
 
@@ -82,28 +91,28 @@ $transition-fade-height: 50px;
     border: 1px solid #555;
 }
 
-.info-box.account{
+.info-box.account {
     display: flex;
-    .pfp-box{
-        border-radius: 100%;
+    .pfp-box {
+        border-radius: 20%;
         overflow: hidden;
         width: 200px;
         height: 200px;
         margin: 20px;
-        img{
+        img {
             width: 100%;
             height: 100%;
         }
     }
-    .other-box{
+    .other-box {
         display: flex;
         align-items: flex-start;
         justify-content: center;
         flex-direction: column;
         flex: 1 0 auto;
         font-size: 24px;
-        color: #AAA;
-        font-family: 'Roboto';
+        color: #aaa;
+        font-family: "Roboto";
     }
 }
 
@@ -158,13 +167,13 @@ $transition-fade-height: 50px;
     background-color: #333;
     box-shadow: 0 0 5px black;
     z-index: 20;
-    .title-text{
+    .title-text {
         height: 100%;
-        font-family: 'Roboto';
+        font-family: "Roboto";
         font-size: 20px;
         display: flex;
         align-items: center;
-        color: #CCC;
+        color: #ccc;
     }
 }
 
@@ -175,31 +184,62 @@ $transition-fade-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #CCC;
+    color: #ccc;
 }
 
-.profile-page-padding{
+.profile-page-padding {
     padding: 50px;
 }
 
-.profile-editable-wrap{
-    .profile-editable{
+.profile-editable-wrap {
+    .profile-editable {
         display: flex;
     }
-    
-    button{
+
+    button {
         margin: 3px 0px 3px 10px;
         margin-left: 10px;
         border: none;
-        background-color: #CCC;
+        background-color: #ccc;
         width: 50px;
         border-radius: 5px;
         outline: none;
         user-select: none;
         transition: all 0.2s ease-in-out;
+        font-family: "Roboto";
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        flex: 0 0 auto;
+        .button-fill {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            animation-name: spin;
+            animation-duration: 1.2s;
+            border-radius: 100%;
+            border: 2px solid black;
+            border-color: black black black transparent;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            position: absolute;
+            margin: auto;
+            width: 12px;
+            height: 12px;
+        }
     }
 
-    input, .size-measure{
+    input,
+    .size-measure {
         user-select: none;
         pointer-events: none;
         background-color: transparent;
@@ -207,21 +247,25 @@ $transition-fade-height: 50px;
         font-size: 26px;
         width: auto;
         color: #ccc;
-        font-family: 'Roboto';
+        font-family: "Roboto";
         border-radius: 5px;
         transition: all 0.2s ease-in-out;
         outline: none;
         padding: 0px 0;
         margin: 3px 0;
     }
-    
-    .size-measure{
+
+    input{
+        flex: 0 1 auto;
+    }
+
+    .size-measure {
         color: transparent;
         position: absolute;
         pointer-events: none;
     }
 
-    .profile-editable-title{
+    .profile-editable-title {
         font-size: 16px;
         font-family: "Roboto";
         margin-bottom: -5px;
@@ -230,21 +274,21 @@ $transition-fade-height: 50px;
     }
 }
 
-.profile-editable-wrap.editing{
-    input{
+.profile-editable-wrap.editing {
+    input {
         user-select: unset;
         pointer-events: visible;
-        border: 1px solid #AAA;
+        border: 1px solid #aaa;
         padding: 3px 0;
         margin: 0px 0;
         padding-left: 10px;
     }
 
-    button{
+    button {
         margin: 0px 0px 0px 10px;
     }
 
-    .profile-editable-title{
+    .profile-editable-title {
         font-size: 16px;
         font-family: "Roboto";
         margin-bottom: 0px;
@@ -252,10 +296,33 @@ $transition-fade-height: 50px;
     }
 }
 
-.profile-editable-wrap.snap{
-    input{
-        transition: width 0.0s;
+.profile-editable-wrap.snap {
+    input {
+        transition: width 0s;
     }
+}
+
+.profile-button-enter {
+    transform: scale(0);
+    opacity: 0px;
+    position: absolute;
+}
+
+.profile-button-enter.profile-button-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 300ms;
+}
+
+.profile-button-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.profile-button-exit.profile-button-exit-active {
+    opacity: 0;
+    transform: scale(0);
+    transition: all 300ms;
 }
 
 @media (max-width: 768px) {
@@ -266,6 +333,14 @@ $transition-fade-height: 50px;
         right: 0;
         top: 0;
         bottom: 0;
+    }
+
+    .profile-nav-side{
+        transition: all 0.3s;
+    }
+
+    .page-selected .profile-nav-side{
+        transform: translateX(-100vw);
     }
 
     .profile-page {
@@ -280,25 +355,80 @@ $transition-fade-height: 50px;
         transform: translateY($transition-fade-height);
     }
 
-    .profile-nav-bar-inner{
+    .profile-nav-bar-inner {
         width: 100%;
     }
 
-    .page-wrap{
+    .page-wrap {
         width: 100%;
         background-color: #333;
     }
 
-    .profile-nav-link{
+    .profile-nav-link {
         padding: 15px;
         width: 100%;
         border-radius: 0;
         display: flex;
         align-items: center;
-        .material-icons{
+        .material-icons {
             display: block;
             font-size: 25px;
             margin-right: 7px;
         }
+    }
+
+    .info-box {
+        margin: 0px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .info-box.account {
+        flex-direction: column;
+        align-items: center;
+        .other-box {
+            width: 100%;
+            .email, .name{
+                width: 100%;
+            }
+        }
+    }
+
+    .profile-editable-wrap {
+            max-width: 100%;
+        input,
+        .size-measure {
+            font-size: 18px;
+        }
+        .profile-editable{
+            max-width: 100%;
+        }
+    }
+
+    .profile-page-padding {
+        padding: 0 0;
+    }
+
+    .profile-fade-enter {
+        opacity: 1;
+        transform: translateY(0) translateX(100vw);
+    }
+
+    .profile-fade-enter.profile-fade-enter-active {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+        transition: all 200ms ease-out;
+    }
+
+    .profile-fade-exit {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+    }
+
+    .profile-fade-exit.profile-fade-exit-active {
+        opacity: 1;
+        transform: translateY(0) translateX(100vw);
+        transition: all 200ms ease-out;
     }
 }

@@ -26,30 +26,33 @@ const Settings = {
                 </div>
                 <div className="other-box">
                     <div className="name">
-                        <EditableText name="Name" text={user.name} onEdited={(s) => { }} />
+                        <EditableText name="Name" text={user.name} onEdited={(s) => {
+                            return new Promise(r => setTimeout(r, 1000));
+                        }} />
                     </div>
                     <div className="email">
-                        <EditableText name="Email" text={"testemail@gmail.com"} onEdited={(s) => { }} />
+                        <EditableText name="Email" text={"testemail@gmail.com"} onEdited={(s) => {
+
+                        }} />
                     </div>
                 </div>
             </div>
-        )
+        );
     }
-}
+};
 
 type EditableTextProps = {
     text: string,
-    onEdited: (newText: string) => void,
-    name?: string,
-    error?: string
+    onEdited: ((newText: string) => string | void) | ((newText: string) => Promise<string | void>),
+    name?: string
 }
 
 class EditableText extends React.Component<
     EditableTextProps,
-    { editing: boolean, loading: boolean, text: string, changed: boolean, noTransition: boolean, boxWidth: number }> {
+    { editing: boolean, loading: boolean, text: string, error?: string, changed: boolean, noTransition: boolean, boxWidth: number }> {
 
     constructor(props: EditableTextProps) {
-        super(props)
+        super(props);
         this.state = {
             text: props.text,
             editing: false,
@@ -57,7 +60,7 @@ class EditableText extends React.Component<
             changed: true,
             noTransition: true,
             boxWidth: 0
-        }
+        };
         this.onEdit = this.onEdit.bind(this);
         this.componentDidUpdate = this.componentDidUpdate.bind(this);
         this.onEditClicked = this.onEditClicked.bind(this);
@@ -67,24 +70,48 @@ class EditableText extends React.Component<
     measureRef: RefObject<HTMLSpanElement> = React.createRef();
     inputRef: RefObject<HTMLInputElement> = React.createRef();
 
+    startText: string = '';
+
+    timeout: any;
+
     onEdit(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ text: e.target.value, changed: true });
     }
 
     onEditClicked() {
         if (this.state.editing) {
+            if(this.timeout != null){
+                clearTimeout(this.timeout);
+                this.timeout = null;
+            }
             this.setState({ editing: false, noTransition: false });
+            if (this.startText != this.state.text) {
+                let err = this.props.onEdited(this.state.text);
+                if (Promise.resolve(err) == err) {
+                    this.setState({ loading: true });
+                    err.then(e => {
+                        if (e != null) {
+                            this.setState({ loading: false, error: e });
+                        }
+                        else {
+                            this.setState({ loading: false });
+                        }
+                    });
+                }
+                else {
+                    if (err != null) {
+                        this.setState({ error: (err as string) });
+                    }
+                }
+            }
         }
         else {
             this.setState({ editing: true, noTransition: false });
-            setTimeout(() => this.setState({ noTransition: true }), 300)
-            if (this.inputRef.current != null) {
-                // console.log('select')
-                // let len = this.inputRef.current.value.length;
-                // this.inputRef.current.focus();
-                // this.inputRef.current.select();
-                // this.inputRef.current.setSelectionRange(len, len);
-            }
+            this.timeout = setTimeout(() => {
+                this.timeout = null;
+                this.setState({ noTransition: true })
+            }, 300);
+            this.startText = this.state.text;
         }
     }
 
@@ -94,13 +121,13 @@ class EditableText extends React.Component<
 
     componentDidMount() {
         this.refreshSize();
-        setTimeout(() => this.setState({ noTransition: false }), 100)
+        setTimeout(() => this.setState({ noTransition: false }), 100);
     }
 
     refreshSize() {
         if (this.measureRef.current != null) {
             if (this.state.changed) {
-                this.setState({ boxWidth: this.measureRef.current.clientWidth, changed: false })
+                this.setState({ boxWidth: this.measureRef.current.clientWidth, changed: false });
             }
         }
     }
@@ -108,7 +135,7 @@ class EditableText extends React.Component<
     render() {
         return (
             <div className={`profile-editable-wrap ${this.state.editing ? 'editing' : ''} ${this.state.noTransition ? 'snap' : ''}`}>
-                {(this.props.name || this.props.error) && (
+                {(this.props.name || this.state.error) && (
                     <div className="profile-editable-title">
                         {this.props.name}
                     </div>
@@ -117,15 +144,26 @@ class EditableText extends React.Component<
                     <input ref={this.inputRef} onChange={this.onEdit} value={this.state.text} disabled={!this.state.editing} spellCheck={false} style={{ width: this.state.boxWidth + 10 }} />
                     <span ref={this.measureRef} className="size-measure">{this.state.text}</span>
                     <button onClick={this.onEditClicked}>
-                        {
-                            (() => {
-                                return this.state.editing ? 'Save' : 'Edit';
-                            })()
-                        }
+                        <TransitionGroup>
+                            <CSSTransition
+                                key={this.state.loading ? 0 : 1}
+                                classNames="profile-button"
+                                timeout={200}
+                            >
+                                {
+                                    (() => {
+                                        return this.state.loading ? (
+                                            <div className="button-fill"><div className="loader"></div></div>
+                                        ) : (this.state.editing ? <div className="button-fill">Save</div> : <div className="button-fill">Edit</div>);
+                                    })()
+                                }
+                            </CSSTransition>
+                        </TransitionGroup>
                     </button>
+                    <div></div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -144,7 +182,7 @@ function PageWrap(props: { name: string, children: any, backClicked: () => void 
                 </div>
             </Scroller>
         </div>
-    )
+    );
 }
 
 export default function MyProfile(props: { onCloseClicked: () => void }) {
@@ -152,7 +190,7 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
     const [loaded, setLoaded]: [boolean, any] = useState<boolean>(false);
 
     if (window.innerWidth < 768 && !loaded) {
-        setCurrPage(Pages.None)
+        setCurrPage(Pages.None);
     }
 
     if (!loaded) setLoaded(true);
@@ -162,7 +200,7 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
             <div onClick={() => setCurrPage(props.to)} className={currPage == props.to ? 'active' : ''}>
                 {props.children}
             </div>
-        )
+        );
     }
 
     return (
@@ -189,26 +227,26 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
                     <CSSTransition
                         key={currPage}
                         classNames="profile-fade"
-                        timeout={10000}
+                        timeout={400}
                     >
                         {
                             (() => {
-                                if (currPage == Pages.None) return <div></div>
+                                if (currPage == Pages.None) return <div></div>;
                                 if (currPage == Pages.Account) return (
                                     <PageWrap backClicked={() => setCurrPage(Pages.None)} name="Account">
                                         <Settings.Account />
                                     </PageWrap>
-                                )
+                                );
                                 if (currPage == Pages.Security) return (
                                     <PageWrap backClicked={() => setCurrPage(Pages.None)} name="Security">
                                         <Settings.Account />
                                     </PageWrap>
-                                )
+                                );
                             })()
                         }
                     </CSSTransition>
                 </TransitionGroup>
             </div>
         </div>
-    )
+    );
 }
