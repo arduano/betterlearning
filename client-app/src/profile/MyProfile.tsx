@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import { useState, useEffect } from "react";
 import { useGlobal } from 'reactn';
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
@@ -20,12 +20,110 @@ const Settings = {
         const webapi = new WebApi();
         if (user == null) return null;
         return (
-            <div className="info-box">
-                <img src={webapi.getPfpUrl(user.id, 512)} />
-                <img src={webapi.getPfpUrl(user.id, 512)} />
-                <img src={webapi.getPfpUrl(user.id, 512)} />
-                <img src={webapi.getPfpUrl(user.id, 512)} />
-                <img src={webapi.getPfpUrl(user.id, 512)} />
+            <div className="info-box account">
+                <div className="pfp-box">
+                    <img src={webapi.getPfpUrl(user.id, 512)} />
+                </div>
+                <div className="other-box">
+                    <div className="name">
+                        <EditableText name="Name" text={user.name} onEdited={(s) => { }} />
+                    </div>
+                    <div className="email">
+                        <EditableText name="Email" text={"testemail@gmail.com"} onEdited={(s) => { }} />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+type EditableTextProps = {
+    text: string,
+    onEdited: (newText: string) => void,
+    name?: string,
+    error?: string
+}
+
+class EditableText extends React.Component<
+    EditableTextProps,
+    { editing: boolean, loading: boolean, text: string, changed: boolean, noTransition: boolean, boxWidth: number }> {
+
+    constructor(props: EditableTextProps) {
+        super(props)
+        this.state = {
+            text: props.text,
+            editing: false,
+            loading: false,
+            changed: true,
+            noTransition: true,
+            boxWidth: 0
+        }
+        this.onEdit = this.onEdit.bind(this);
+        this.componentDidUpdate = this.componentDidUpdate.bind(this);
+        this.onEditClicked = this.onEditClicked.bind(this);
+        this.refreshSize = this.refreshSize.bind(this);
+    }
+
+    measureRef: RefObject<HTMLSpanElement> = React.createRef();
+    inputRef: RefObject<HTMLInputElement> = React.createRef();
+
+    onEdit(e: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ text: e.target.value, changed: true });
+    }
+
+    onEditClicked() {
+        if (this.state.editing) {
+            this.setState({ editing: false, noTransition: false });
+        }
+        else {
+            this.setState({ editing: true, noTransition: false });
+            setTimeout(() => this.setState({ noTransition: true }), 300)
+            if (this.inputRef.current != null) {
+                // console.log('select')
+                // let len = this.inputRef.current.value.length;
+                // this.inputRef.current.focus();
+                // this.inputRef.current.select();
+                // this.inputRef.current.setSelectionRange(len, len);
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        this.refreshSize();
+    }
+
+    componentDidMount() {
+        this.refreshSize();
+        setTimeout(() => this.setState({ noTransition: false }), 100)
+    }
+
+    refreshSize() {
+        if (this.measureRef.current != null) {
+            if (this.state.changed) {
+                this.setState({ boxWidth: this.measureRef.current.clientWidth, changed: false })
+            }
+        }
+    }
+
+    render() {
+        return (
+            <div className={`profile-editable-wrap ${this.state.editing ? 'editing' : ''} ${this.state.noTransition ? 'snap' : ''}`}>
+                {(this.props.name || this.props.error) && (
+                    <div className="profile-editable-title">
+                        {this.props.name}
+                    </div>
+                )}
+                <div className="profile-editable" >
+                    <input ref={this.inputRef} onChange={this.onEdit} value={this.state.text} disabled={!this.state.editing} spellCheck={false} style={{ width: this.state.boxWidth + 10 }} />
+                    <span ref={this.measureRef} className="size-measure">{this.state.text}</span>
+                    <button onClick={this.onEditClicked}>
+                        {
+                            (() => {
+                                return this.state.editing ? 'Save' : 'Edit';
+                            })()
+                        }
+                    </button>
+                </div>
             </div>
         )
     }
@@ -33,15 +131,17 @@ const Settings = {
 
 function PageWrap(props: { name: string, children: any, backClicked: () => void }) {
     return (
-        <div>
+        <div className="page-wrap">
             <div className="page-mobile-title">
-                <div onClick={props.backClicked} className="page-mobile-back-button">
-
+                <div onClick={props.backClicked} className="page-mobile-back-button material-icons">
+                    arrow_back
                 </div>
-                <div>{props.name}</div>
+                <div className="title-text">{props.name}</div>
             </div>
             <Scroller>
-                {props.children}
+                <div className="profile-page-padding">
+                    {props.children}
+                </div>
             </Scroller>
         </div>
     )
@@ -51,11 +151,11 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
     const [currPage, setCurrPage]: [Pages, any] = useState<Pages>(Pages.Account);
     const [loaded, setLoaded]: [boolean, any] = useState<boolean>(false);
 
-    if(window.innerWidth < 768 && !loaded){
+    if (window.innerWidth < 768 && !loaded) {
         setCurrPage(Pages.None)
     }
 
-    if(!loaded) setLoaded(true);
+    if (!loaded) setLoaded(true);
 
     function Link(props: { children: any, to: Pages }) {
         return (

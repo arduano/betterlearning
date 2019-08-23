@@ -73,7 +73,7 @@ export class Scroller extends React.Component<{}, scrollerState>{
         return (
             <div className={`scrollable ${this.state.dragging ? 'dragging' : ''}`}>
                 <div ref={this.scrollParent} className="scroll-parent" onScroll={() => this.updateScroll(this)}>
-                    <div ref={this.scrollChild} className="scroll-child" style={{ paddingRight: this.state.cancelWidth + 'px' }}>
+                    <div ref={this.scrollChild} className="scroll-child" style={{ paddingRight: this.state.cancelWidth + 1 + 'px' }}>
                         <div style={{ marginRight: -this.state.cancelWidth + 'px', minHeight: "100%" }}>
                             {this.props.children}
                         </div>

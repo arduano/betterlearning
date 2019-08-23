@@ -20,6 +20,7 @@
     "react-dom": "^16.8.6",
     "react-draft-wysiwyg": "^1.13.2",
     "react-iframe-resizer": "^1.0.1",
+    "react-pure-lifecycle": "^3.0.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "react-transition-group": "^4.2.1",
