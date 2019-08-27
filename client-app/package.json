@@ -23,8 +23,10 @@
     "react-pure-lifecycle": "^3.0.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
+    "react-sortablejs": "^1.5.1",
     "react-transition-group": "^4.2.1",
     "reactn": "^2.1.7",
+    "sortablejs": "^1.6.1",
     "typescript": "3.5.3"
   },
   "scripts": {

@@ -2,13 +2,7 @@ import React, { RefObject } from "react";
 import './Course.scss';
 import { Scroller } from "../scroller/Scroller";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    Redirect
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
 import { AppState } from "../utils/AppState";
@@ -17,6 +11,7 @@ import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
 import MyProfile from "../profile/MyProfile";
+const Sortable = require('react-sortablejs');
 
 interface CourseStatePrivate extends CourseState {
     navHidden: boolean,
@@ -223,6 +218,11 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
             </div>
         )
     }
+}
+
+function EditableNavLinks(props: {}){
+    const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+    
 }
 
 class NavFolder extends React.Component<

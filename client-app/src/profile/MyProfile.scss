@@ -78,6 +78,7 @@ $transition-fade-height: 50px;
 
 .page-wrap {
     max-width: 1000px;
+    resize: none;
 }
 
 .page > div {
@@ -94,6 +95,7 @@ $transition-fade-height: 50px;
 .info-box.account {
     display: flex;
     .pfp-box {
+        flex: 0 0 auto;
         border-radius: 20%;
         overflow: hidden;
         width: 200px;
@@ -109,10 +111,14 @@ $transition-fade-height: 50px;
         align-items: flex-start;
         justify-content: center;
         flex-direction: column;
-        flex: 1 0 auto;
+        flex: 1 1 auto;
         font-size: 24px;
         color: #aaa;
         font-family: "Roboto";
+        .name,
+        .email {
+            max-width: 100%;
+        }
     }
 }
 
@@ -189,11 +195,18 @@ $transition-fade-height: 50px;
 
 .profile-page-padding {
     padding: 50px;
+    max-width: 100%;
 }
 
 .profile-editable-wrap {
+    max-width: 100%;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+
     .profile-editable {
         display: flex;
+        max-width: 100%;
     }
 
     button {
@@ -255,7 +268,7 @@ $transition-fade-height: 50px;
         margin: 3px 0;
     }
 
-    input{
+    input {
         flex: 0 1 auto;
     }
 
@@ -335,11 +348,11 @@ $transition-fade-height: 50px;
         bottom: 0;
     }
 
-    .profile-nav-side{
+    .profile-nav-side {
         transition: all 0.3s;
     }
 
-    .page-selected .profile-nav-side{
+    .page-selected .profile-nav-side {
         transform: translateX(-100vw);
     }
 
@@ -389,19 +402,21 @@ $transition-fade-height: 50px;
         align-items: center;
         .other-box {
             width: 100%;
-            .email, .name{
+            .email,
+            .name {
                 width: 100%;
             }
         }
     }
 
     .profile-editable-wrap {
-            max-width: 100%;
+        max-width: 100%;
+        height: 50px;
         input,
         .size-measure {
             font-size: 18px;
         }
-        .profile-editable{
+        .profile-editable {
             max-width: 100%;
         }
     }
