@@ -160,24 +160,60 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         }).bind(this);
 
         const EditableNavLinkFolder = ((props: { folder: Folder }) => {
-            if (props.folder.folded == null) props.folder.folded = false;
+            if (props.folder.folded == null) props.folder.folded = true;
+            const [heightAuto, setHeightAuto]: [boolean, any] = useState<boolean>(!props.folder.folded);
             const [folded, setFolded]: [boolean, any] = useState<boolean>(props.folder.folded);
             const [unfoldHeight, setUnfoldHeight]: [number, any] = useState<number>(0);
+            const [folding, setFolding]: [boolean, any] = useState<boolean>(false);
+
+            const [tout, setTout]: [number | null, any] = useState(null);
+            const [heightRef, setHeightRef]: [HTMLElement | null, any] = useState<HTMLElement | null>(null);
+
+            if (!folded && heightRef != null)
+                if (heightRef.clientHeight != unfoldHeight)
+                    setUnfoldHeight(heightRef!.clientHeight);
+
+            const toggleOpen = () => {
+                props.folder.folded = !props.folder.folded;
+                setFolded(props.folder.folded);
+                if (!folded) {
+                    setHeightAuto(false);
+                    setFolding(true);
+                    if (tout != null) {
+                        clearTimeout(tout);
+                    }
+                    setTout(setTimeout(() => {
+                        setUnfoldHeight(0);
+                        setFolding(false);
+                        setTout(null);
+                    }, 10))
+                }
+                else {
+                    setUnfoldHeight(heightRef!.clientHeight);
+                    if (tout != null) clearTimeout(tout);
+                    setTout(setTimeout(() => {
+                        setHeightAuto(true);
+                        setTout(null);
+                    }, 300))
+                }
+            }
+
+            if (folding) {
+                console.log(unfoldHeight)
+            }
 
             return (
                 <div>
-                    <div className={`nav-link nav-folder ${props.folder.folded ? '' : 'open'}`} onClick={() => { props.folder.folded = !props.folder.folded; setFolded(props.folder.folded) }}>
+                    <div className={`nav-link nav-folder ${folded ? '' : 'open'}`} onClick={toggleOpen}>
                         <span>{props.folder.name}</span>
                         <span className="nav-folder-arrow">
                             <i className="material-icons down">keyboard_arrow_down</i>
                             <i className="material-icons up">keyboard_arrow_up</i>
                         </span>
                     </div>
-                    <div className="links-collapse" style={{ height: props.folder.folded ? 0 : 'auto' }}>
+                    <div className={`links-collapse ${heightAuto ? 'height-auto' : ''}`} style={{ height: heightAuto ? undefined : (unfoldHeight) }}>
                         <div ref={(e) => {
-                            if (e != null)
-                                if (e.clientHeight != unfoldHeight)
-                                    setUnfoldHeight(e.clientHeight);
+                            setHeightRef(e);
                         }}>
                             <Sortable
                                 tag="div"
@@ -227,13 +263,13 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         swapThreshold: 0.2,
                     }}
                     onChange={(order: any, sortable: any, evt: any) => {
-                        //this.setState({ items: order });
+                        console.log(order);
                     }}
                 >
                     {pages.map((p, i) => {
                         if ((p as NavPage).id != null) {
                             return (
-                                <div key={i} >
+                                <div key={i} data-id={i}>
                                     <EditableNavLink link={p as NavPage} />
                                 </div>
                             )
