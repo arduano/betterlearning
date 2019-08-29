@@ -218,6 +218,9 @@ a {
     -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
     background-color: #0002;
+    box-shadow: 
+    inset 0px 11px 8px -10px black,
+    inset 0px -11px 8px -10px black; 
     .top-shadow {
         height: 10px;
         margin-top: -10px;
