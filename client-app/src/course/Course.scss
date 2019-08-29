@@ -133,6 +133,7 @@ $transition-fade-height: 50px;
 
 .nav-content {
     flex: 1 0 0;
+    height: 100%;
 }
 
 .content {
@@ -215,32 +216,19 @@ a {
 
 .links-collapse {
     overflow: hidden;
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: all 0.2s ease;
-    -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
     background-color: #0002;
     box-shadow: 
         inset 0px 11px 8px -10px black,
         inset 0px -11px 8px -10px black;
-    .top-shadow {
-        height: 10px;
-        margin-top: -10px;
-        width: 100%;
-        //background-color: red;
-        box-shadow: black 0 0 10px;
-    }
-    .bottom-shadow {
-        height: 10px;
-        margin-bottom: -10px;
-        width: 100%;
-        //background-color: red;
-        box-shadow: black 0 0 10px;
-    }
 }
 
 .links-collapse.height-auto{
     height: auto;
+}
+
+.links-collapse.height-auto > div > div{
+    min-height: 10px;
 }
 
 .fill{

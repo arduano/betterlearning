@@ -114,39 +114,64 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         return <div></div>
     }
 
-    NavLinks(props: { pages: (NavPage | NavPageFolder)[], parent: Course }) {
-        return (
-            <div>
-                {props.pages.map((e, i) => {
-                    if ((e as NavPage).id != null) {
-                        e = e as NavPage;
-                        return (
-                            <Link to={e.id} key={i}>
-                                <div className="nav-link" onClick={() => { if (!props.parent.state.navHidden) props.parent.mobileToggleNav() }}>
-                                    {e.name}
-                                </div>
-                            </Link>
-                        );
-                    }
-                    else {
-                        return (<NavFolder key={i} pages={(e as NavPageFolder).pages} parent={props.parent} name={e.name} />)
-                    }
-                })}
-            </div>
-        );
-    }
-
     EditableNavLinks(props: { pages: (NavPage | NavPageFolder)[] }) {
-        const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
-        const [pages, setPages]: [(NavPage | NavPageFolder)[], any] = useState([])
-
         interface Folder extends NavPageFolder {
-            folded?: boolean
+            folded: boolean,
+            id: string
         }
 
-        if (props.pages.length != pages.length) {
-            setPages(props.pages);
-            console.log('set pages')
+        const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+        const [pages, setPages]: [(NavPage | Folder)[], any] = useState([])
+        let _pages: (NavPage | Folder)[] = pages;
+        function _setPages(p: (NavPage | Folder)[]){
+            _pages = p;
+            setPages(p);
+        }
+        const [pageDict, setPageDict]: [any, any] = useState(null)
+
+        if (props.pages.length != pages.length && pages.length == 0) {
+            let pgs: (NavPage | Folder)[] = []
+
+            let folderid = 0;
+            props.pages.forEach(p => {
+                if ((p as NavPage).id == null) {
+                    let f: Folder = {
+                        id: '@' + folderid++,
+                        folded: true,
+                        name: (p as NavPageFolder).name,
+                        pages: []
+                    };
+                    (p as NavPageFolder).pages.forEach(_p => {
+                        f.pages.push(_p);
+                    });
+                    pgs.push(f);
+                }
+                else {
+                    pgs.push(p as NavPage);
+                }
+            });
+            setPages(pgs);
+        }
+
+        if (pageDict == null && pages.length != 0)
+            updatePageDict();
+
+        function updatePageDict() {
+            let d: any = {};
+            pages.forEach(p => {
+                d[p.id] = p;
+                if ((p as Folder).pages != null) {
+                    (p as NavPageFolder).pages.forEach(_p => {
+                        d[_p.id] = _p;
+                    });
+                }
+            });
+            setPageDict(d);
+        }
+
+        function getPageList(p: string[]) {
+            return p.map(_p => pageDict[_p]);
+
         }
 
         const EditableNavLink = ((props: { link: NavPage }) => {
@@ -159,7 +184,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
             )
         }).bind(this);
 
-        const EditableNavLinkFolder = ((props: { folder: Folder }) => {
+        const EditableNavLinkFolder = ((props: { folder: Folder, id: number }) => {
             if (props.folder.folded == null) props.folder.folded = true;
             const [heightAuto, setHeightAuto]: [boolean, any] = useState<boolean>(!props.folder.folded);
             const [folded, setFolded]: [boolean, any] = useState<boolean>(props.folder.folded);
@@ -180,13 +205,13 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                     setHeightAuto(false);
                     setFolding(true);
                     if (tout != null) {
-                        clearTimeout(tout);
+                        clearTimeout(tout); 
                     }
                     setTout(setTimeout(() => {
                         setUnfoldHeight(0);
                         setFolding(false);
                         setTout(null);
-                    }, 10))
+                    }, 30))
                 }
                 else {
                     setUnfoldHeight(heightRef!.clientHeight);
@@ -230,12 +255,18 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                     swapThreshold: 0.2,
                                 }}
                                 onChange={(order: any, sortable: any, evt: any) => {
-                                    //this.setState({ items: order });
+                                    console.log(order)
+                                    _setPages(_pages.map(e => {
+                                        if(e.id == props.folder.id){
+                                            (e as Folder).pages = getPageList(order);
+                                        }
+                                        return e;
+                                    }));
                                 }}
                             >
                                 {
                                     props.folder.pages.map((e, i) => (
-                                        <div key={i}>
+                                        <div key={i} data-id={e.id}>
                                             <EditableNavLink link={e} />
                                         </div>
                                     ))
@@ -263,19 +294,24 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         swapThreshold: 0.2,
                     }}
                     onChange={(order: any, sortable: any, evt: any) => {
-                        console.log(order);
+                        console.log('parent', order, getPageList(order))
+                        _setPages(getPageList(order));
                     }}
                 >
-                    {pages.map((p, i) => {
-                        if ((p as NavPage).id != null) {
+                    {_pages.map((p, i) => {
+                        if ((p as Folder).pages == null) {
                             return (
-                                <div key={i} data-id={i}>
+                                <div key={i} data-id={(p as NavPage).id}>
                                     <EditableNavLink link={p as NavPage} />
                                 </div>
                             )
                         }
                         else {
-                            return <EditableNavLinkFolder key={i} folder={p as Folder}></EditableNavLinkFolder>
+                            return (
+                                <div key={i} data-id={p.id}>
+                                    <EditableNavLinkFolder id={i} folder={p as Folder}></EditableNavLinkFolder>
+                                </div>
+                            )
                         }
                     })}
                 </Sortable>
@@ -366,62 +402,5 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                 </TransitionGroup>
             </div>
         )
-    }
-}
-
-class NavFolder extends React.Component<
-    { pages: NavPage[], name: string, parent: Course },
-    { folded: boolean, unfoldHeight: number }>{
-    constructor(props: { pages: NavPage[], name: string, parent: Course }) {
-        super(props)
-        this.state = {
-            folded: true,
-            unfoldHeight: 0
-        };
-        this.linksHeight = React.createRef();
-    }
-
-    linksHeight: RefObject<HTMLDivElement>;
-
-    render() {
-        let pages = this.props.pages.map((e, i) => {
-            if ((e as NavPage).id != null) {
-                e = e as NavPage;
-                return (
-                    <Link to={e.id} key={i}>
-                        <div className="nav-link nav-child-link" onClick={() => { if (!this.props.parent.state.navHidden) this.props.parent.mobileToggleNav() }}>
-                            {e.name}
-                        </div>
-                    </Link>
-                );
-            }
-        });
-
-        return (
-            <div>
-                <div className={`nav-link nav-folder ${this.state.folded ? '' : 'open'}`} onClick={() => this.toggleFold(this)}>
-                    <span>{this.props.name}</span>
-                    <span className="nav-folder-arrow">
-                        <i className="material-icons down">keyboard_arrow_down</i>
-                        <i className="material-icons up">keyboard_arrow_up</i>
-                    </span>
-                </div>
-                <div className="links-collapse" style={{ height: this.state.unfoldHeight }}>
-                    <div className="top-shadow" />
-                    <div ref={this.linksHeight}>
-                        {pages}
-                    </div>
-                    <div className="bottom-shadow" />
-                </div>
-            </div>
-        )
-    }
-
-    toggleFold(_: any) {
-        this.setState({ folded: !this.state.folded });
-        if (this.state.folded && this.linksHeight.current != null)
-            this.setState({ unfoldHeight: this.linksHeight.current.clientHeight });
-        else
-            this.setState({ unfoldHeight: 0 });
     }
 }
