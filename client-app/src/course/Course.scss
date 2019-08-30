@@ -164,6 +164,40 @@ a {
     padding: 20px 30px;
     font-family: "Roboto", sans-serif;
     font-size: 18px;
+    display: flex;
+    height: 35px;
+    align-items: center;
+    .name{
+        margin-top: 2px;
+        width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .material-icons{
+        opacity: 0.0;
+        width: 0px;
+        transition: width 0.2s;
+        border: 1px solid transparent;
+    }
+}
+
+.nav-link.editing{
+    .material-icons{
+        opacity: 0.3;
+        width: 30px;
+    }
+    
+    .material-icons:hover{
+        background-color: #FFF3;
+    }
+    
+    .material-icons:active{
+        background-color: #FFF4;
+    }
+}
+
+.nav-link.editing-name .edit-icon{
+    border-color: #CCC;
 }
 
 .nav-link:hover {
@@ -178,16 +212,14 @@ a {
     .nav-folder-arrow {
         padding: 0px;
         margin: 0px;
-        float: right;
-        margin-top: -5px;
         position: relative;
+        width: 30px;
+        height: 100%;
+        margin-top: 5px;
         i {
             position: absolute;
             font-size: 30px;
-            right: 0px;
-            -webkit-transition: all 0.2s ease;
-            -moz-transition: all 0.2s ease;
-            -o-transition: all 0.2s ease;
+            left: 0px;
             transition: all 0.2s ease;
         }
         .down {
@@ -212,8 +244,6 @@ a {
     }
 }
 
-
-
 .links-collapse {
     overflow: hidden;
     transition: all 0.2s ease;
@@ -228,7 +258,7 @@ a {
 }
 
 .links-collapse.height-auto > div > div{
-    min-height: 10px;
+    min-height: 30px;
 }
 
 .fill{

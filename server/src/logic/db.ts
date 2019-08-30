@@ -91,7 +91,7 @@ const Pages: Page[] = [
     {
         id: '3',
         courseId: '1234',
-        name: 'Page 3',
+        name: 'Page 3 Page 3 Page 3 Page 3 Page 3 Page 3',
         type: 'html',
         data: { html: '<html><head><style>div{background-color:red;}</style></head><body><div>test</div></body></html>' },
         comments: [

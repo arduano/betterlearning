@@ -121,9 +121,10 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         }
 
         const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+        const [editing, setEditing]: [boolean, any] = useState(false);
         const [pages, setPages]: [(NavPage | Folder)[], any] = useState([])
         let _pages: (NavPage | Folder)[] = pages;
-        function _setPages(p: (NavPage | Folder)[]){
+        function _setPages(p: (NavPage | Folder)[]) {
             _pages = p;
             setPages(p);
         }
@@ -142,12 +143,12 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         pages: []
                     };
                     (p as NavPageFolder).pages.forEach(_p => {
-                        f.pages.push(_p);
+                        f.pages.push({ ..._p });
                     });
                     pgs.push(f);
                 }
                 else {
-                    pgs.push(p as NavPage);
+                    pgs.push({ ...p } as NavPage);
                 }
             });
             setPages(pgs);
@@ -171,20 +172,40 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
 
         function getPageList(p: string[]) {
             return p.map(_p => pageDict[_p]);
-
         }
 
-        const EditableNavLink = ((props: { link: NavPage }) => {
+        const EditableNavLink = ((props: { link: NavPage, editing: boolean }) => {
+            const [editingName, setEditingName]: [boolean, any] = useState(false);
+            const [linkName, setLinkName]: [string, any] = useState(props.link.name);
+
+            if (!editing && editingName) setEditingName(false);
+
+            props.link.name = linkName;
+
             return (
                 <Link to={props.link.id}>
-                    <div className="nav-link nav-child-link" onClick={() => { if (!this.state.navHidden) this.mobileToggleNav() }}>
-                        {props.link.name}
+                    <div className={`nav-link nav-child-link ${props.editing ? 'editing' : ''} ${editingName ? 'editing-name' : ''}`} onClick={() => { if (!this.state.navHidden) this.mobileToggleNav() }}>
+                        <div className="material-icons">drag_indicator</div>
+                        {
+                            editingName ?
+                                (<input value={props.link.name} className="name" />) :
+                                (<div className="name">{props.link.name}</div>)
+                        
+                        }
+                        <div className="material-icons edit-icon" onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}>create</div>
+                        <div className="material-icons delete-icon" onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation();
+                        }}>delete</div>
                     </div>
                 </Link>
             )
         }).bind(this);
 
-        const EditableNavLinkFolder = ((props: { folder: Folder, id: number }) => {
+        const EditableNavLinkFolder = ((props: { folder: Folder, id: number, editing: boolean }) => {
             if (props.folder.folded == null) props.folder.folded = true;
             const [heightAuto, setHeightAuto]: [boolean, any] = useState<boolean>(!props.folder.folded);
             const [folded, setFolded]: [boolean, any] = useState<boolean>(props.folder.folded);
@@ -205,7 +226,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                     setHeightAuto(false);
                     setFolding(true);
                     if (tout != null) {
-                        clearTimeout(tout); 
+                        clearTimeout(tout);
                     }
                     setTout(setTimeout(() => {
                         setUnfoldHeight(0);
@@ -229,8 +250,17 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
 
             return (
                 <div>
-                    <div className={`nav-link nav-folder ${folded ? '' : 'open'}`} onClick={toggleOpen}>
-                        <span>{props.folder.name}</span>
+                    <div className={`nav-link nav-folder ${folded ? '' : 'open'} ${props.editing ? 'editing' : ''}`} onClick={toggleOpen}>
+                        <div className="material-icons">drag_indicator</div>
+                        <div className="name">{props.folder.name}</div>
+                        <div className="material-icons edit-icon" onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}>create</div>
+                        <div className="material-icons delete-icon" onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation();
+                        }}>delete</div>
                         <span className="nav-folder-arrow">
                             <i className="material-icons down">keyboard_arrow_down</i>
                             <i className="material-icons up">keyboard_arrow_up</i>
@@ -257,7 +287,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                 onChange={(order: any, sortable: any, evt: any) => {
                                     console.log(order)
                                     _setPages(_pages.map(e => {
-                                        if(e.id == props.folder.id){
+                                        if (e.id == props.folder.id) {
                                             (e as Folder).pages = getPageList(order);
                                         }
                                         return e;
@@ -267,7 +297,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                 {
                                     props.folder.pages.map((e, i) => (
                                         <div key={i} data-id={e.id}>
-                                            <EditableNavLink link={e} />
+                                            <EditableNavLink editing={props.editing} link={e} />
                                         </div>
                                     ))
                                 }
@@ -302,19 +332,22 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         if ((p as Folder).pages == null) {
                             return (
                                 <div key={i} data-id={(p as NavPage).id}>
-                                    <EditableNavLink link={p as NavPage} />
+                                    <EditableNavLink editing={editing} link={p as NavPage} />
                                 </div>
                             )
                         }
                         else {
                             return (
                                 <div key={i} data-id={p.id}>
-                                    <EditableNavLinkFolder id={i} folder={p as Folder}></EditableNavLinkFolder>
+                                    <EditableNavLinkFolder editing={editing} id={i} folder={p as Folder}></EditableNavLinkFolder>
                                 </div>
                             )
                         }
                     })}
                 </Sortable>
+                <div>
+                    <button onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
+                </div>
             </div >
         )
     }
