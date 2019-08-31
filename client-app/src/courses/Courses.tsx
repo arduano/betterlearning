@@ -17,48 +17,6 @@ export const Courses = (props: {}) => {
     return (
         <div className="courseList">
             {user.courses.map((c, i) => (<CourseTile courseid={c.id} key={i} />))}
-            <div>
-                <Sortable
-                    options={{
-                        group: {
-                            name: 'parent',
-                            put: ['folder'],
-                            pull: ['folder']
-                        },
-                        animation: 150,
-                        fallbackOnBody: true,
-                        swapThreshold: 0.2
-                    }}
-                >
-                    {
-                        (['t1', 't2', 't3'].map((e, i) => (
-                            <li className="folder" key={i}>
-                                {e}
-                                <div style={{ paddingLeft: "30px" }}>
-                                    <Sortable
-                                        options={{
-                                            group: {
-                                                name: 'folder',
-                                                pull: ['parent'],
-                                                put: (from: any, to: any, h: HTMLElement) => {
-                                                    return !h.classList.contains('folder');
-                                                }
-                                            },
-                                            animation: 150,
-                                            fallbackOnBody: true,
-                                            swapThreshold: 0.2
-                                        }}
-                                    >
-                                        {['c1', 'c2', 'c3'].map((e, i) => (
-                                            <li>{e}<button onClick={e => console.log('test!')}>test</button></li>
-                                        ))}
-                                    </Sortable>
-                                </div>
-                            </li>
-                        )))
-                    }
-                </Sortable>
-            </div>
         </div>
     )
 }

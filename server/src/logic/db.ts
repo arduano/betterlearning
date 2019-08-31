@@ -51,7 +51,8 @@ const Courses: Course[] = [
                     '1',
                 ]
             }
-        ]
+        ],
+        admins: ['1234']
     }]
 
 const Pages: Page[] = [

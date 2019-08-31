@@ -51,24 +51,23 @@ $transition-fade-height: 50px;
     .right {
         flex: none;
         display: flex;
-        cursor: pointer;
         user-select: none;
     }
-    .right .profile-button{
-        width: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+    .right .profile-button {
+        width: $top-bar-height - 10px;
+        height: $top-bar-height - 10px;
         transition: all 0.15s ease-in-out;
-        font-size: 30px;
-        font-family: 'Roboto';
-        font-weight: 700px;
-        background-color: #FFF1;
-        color: white;
-    }
-    .right:hover .profile-button{
-        width: 150px;
+        padding: 5px;
+        img {
+            width: 100%;
+            height: 100%;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        img:hover {
+            border-radius: 10px;
+        }
     }
 }
 
@@ -96,6 +95,39 @@ $transition-fade-height: 50px;
     flex-direction: column;
     height: 100%;
     box-shadow: 0px 0px 5px black;
+}
+
+.edit-buttons-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    button{
+        background-color: #222;
+        border: none;
+        border-radius: 3px;
+        font-family: 'Roboto';
+        //font-weight: 500;
+        font-size: 16px;
+        padding: 5px;
+        margin: 2px;
+        color: #ccc;
+        outline: none;
+        transition: transform 0.1s;
+    }
+    button:hover{
+        background-color: #333;
+    }
+
+    button:active{
+        transform: translateY(5px);
+    }
+
+    .edit{
+        flex: 0 1 100px;   
+    }
+    .new-folder{
+        flex: 0 1 120px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -167,45 +199,93 @@ a {
     display: flex;
     height: 35px;
     align-items: center;
-    .name{
+    position: relative;
+    .name {
         margin-top: 2px;
         width: 100%;
         flex: 1 1 auto;
     }
 
-    .material-icons{
-        opacity: 0.0;
+    .material-icons {
+        opacity: 0;
         width: 0px;
         transition: width 0.2s;
         border: 1px solid transparent;
+        border-radius: 3px;
+    }
+
+    .drag-handle, .edit-icon, .delete-icon{
+        display: none;
+    }
+
+    .input-container {
+        position: relative;
+        width: 100%;
+        height: 25px;
+        flex: 1 1 auto;
+        div {
+            position: absolute;
+            top: -3px;
+            bottom: 2px;
+            right: 14px;
+            left: 0;
+            input {
+                width: 100%;
+                height: 100%;
+                font-family: "Roboto", sans-serif;
+                font-size: 18px;
+                color: white;
+                background-color: transparent;
+                border: 2px solid #ccc;
+                border-radius: 5px;
+                padding-left: 5px;
+                margin-right: 20px;
+                outline: none;
+            }
+        }
+    }
+
+    .drag-handle {
+        pointer-events: none;
+    }
+
+    .highlight-fill {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    .highlight-fill:hover {
+        background-color: #fff2;
+    }
+
+    .highlight-fill:active {
+        background-color: #fff4;
     }
 }
 
-.nav-link.editing{
-    .material-icons{
+.nav-link.editing {
+    .material-icons {
         opacity: 0.3;
         width: 30px;
+        display: block;
     }
-    
-    .material-icons:hover{
-        background-color: #FFF3;
+
+    .edit-icon:hover,
+    .delete-icon:hover {
+        background-color: #fff3;
     }
-    
-    .material-icons:active{
-        background-color: #FFF4;
+
+    .edit-icon:active,
+    .delete-icon:active {
+        background-color: #fff4;
     }
 }
 
-.nav-link.editing-name .edit-icon{
-    border-color: #CCC;
-}
-
-.nav-link:hover {
-    background-color: #fff2;
-}
-
-.nav-link:active {
-    background-color: #fff4;
+.nav-link.editing-name .edit-icon {
+    border-color: #ccc;
 }
 
 .nav-folder {
@@ -216,6 +296,7 @@ a {
         width: 30px;
         height: 100%;
         margin-top: 5px;
+        pointer-events: none;
         i {
             position: absolute;
             font-size: 30px;
@@ -248,20 +329,18 @@ a {
     overflow: hidden;
     transition: all 0.2s ease;
     background-color: #0002;
-    box-shadow: 
-        inset 0px 11px 8px -10px black,
-        inset 0px -11px 8px -10px black;
+    box-shadow: inset 0px 11px 8px -10px black, inset 0px -11px 8px -10px black;
 }
 
-.links-collapse.height-auto{
+.links-collapse.height-auto {
     height: auto;
 }
 
-.links-collapse.height-auto > div > div{
+.links-collapse.height-auto > div > div {
     min-height: 30px;
 }
 
-.fill{
+.fill {
     position: absolute;
     left: 0;
     right: 0;
@@ -321,12 +400,12 @@ a {
     bottom: 0;
 }
 
-.zoom-fade-enter.profile-view{
+.zoom-fade-enter.profile-view {
     transform: scale(1.1);
     z-index: 1;
 }
 
-.zoom-fade-enter.courses-view{
+.zoom-fade-enter.courses-view {
     transform: scale(0.9);
     z-index: 0;
 }

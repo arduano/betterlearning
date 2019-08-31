@@ -57,6 +57,11 @@ $transition-fade-height: 50px;
     }
 }
 
+.profile-nav-link.logout{
+    color: #C00;
+    margin-top: 10px;
+}
+
 .profile-nav-link:hover {
     background-color: #0004;
 }

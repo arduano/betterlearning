@@ -27,7 +27,8 @@ export class Courses {
             let c: CourseState = {
                 courseId: course.id,
                 courseName: course.name,
-                pages: pages
+                pages: pages,
+                admins: course.admins
             }
             return c;
         }

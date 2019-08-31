@@ -12,4 +12,5 @@ export interface CourseState {
     courseName: string,
     courseId: string,
     pages: (NavPage | NavPageFolder)[],
+    admins: string[]
 }

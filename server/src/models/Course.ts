@@ -4,4 +4,5 @@ export interface Course {
     name: string,
     pages: string[]
     navPages: (string | { name: string, pages: string[] })[],
+    admins: string[]
 }

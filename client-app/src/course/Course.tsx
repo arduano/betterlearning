@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Switch, Route, Link, Redirect, NavLink } from 
 import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
 import { AppState } from "../utils/AppState";
-import { useGlobal } from 'reactn';
+import { useGlobal, Component } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
@@ -19,21 +19,27 @@ interface CourseStatePrivate extends CourseState {
 }
 
 type CourseProps = { match: { params: { id: string } } };
-export class Course extends React.Component<CourseProps, CourseStatePrivate> {
+export class Course extends Component<CourseProps, CourseStatePrivate> {
     webapi: WebApi | null = null;
 
     pageQueries: any = {};
 
-    constructor(props: CourseProps, state: CourseState) {
-        super(props)
+    props: CourseProps;
 
+    isUserTeacher: boolean = false;
+
+    constructor(props: CourseProps, state: CourseState) {
+        super();
+        this.props = props;
         this.state = {
             pages: [],
             navHidden: true,
             courseName: '',
             courseId: '',
+            admins: [],
             profileOpen: false
         };
+
         this.mobileToggleNav = this.mobileToggleNav.bind(this);
         this.PageFeeder = this.PageFeeder.bind(this);
         this.OpenFirstPage = this.OpenFirstPage.bind(this);
@@ -63,6 +69,8 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         }
                 }
             });
+
+            this.isUserTeacher = state.admins.includes(((this.global as AppState).signedInUser as LoggedInUserInfo).id);
 
             this.setState(state);
         });
@@ -123,6 +131,8 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
         const [editing, setEditing]: [boolean, any] = useState(false);
         const [pages, setPages]: [(NavPage | Folder)[], any] = useState([])
+        const [lastFolderID, setLastFolderID]: [number, any] = useState(0)
+
         let _pages: (NavPage | Folder)[] = pages;
         function _setPages(p: (NavPage | Folder)[]) {
             _pages = p;
@@ -133,7 +143,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
         if (props.pages.length != pages.length && pages.length == 0) {
             let pgs: (NavPage | Folder)[] = []
 
-            let folderid = 0;
+            let folderid = lastFolderID;
             props.pages.forEach(p => {
                 if ((p as NavPage).id == null) {
                     let f: Folder = {
@@ -151,6 +161,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                     pgs.push({ ...p } as NavPage);
                 }
             });
+            setLastFolderID(folderid);
             setPages(pgs);
         }
 
@@ -174,46 +185,70 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
             return p.map(_p => pageDict[_p]);
         }
 
-        const EditableNavLink = ((props: { link: NavPage, editing: boolean }) => {
+        const EditableNavLink = ((props: { link: NavPage, editing: boolean, onDelete: () => void }) => {
             const [editingName, setEditingName]: [boolean, any] = useState(false);
             const [linkName, setLinkName]: [string, any] = useState(props.link.name);
 
             if (!editing && editingName) setEditingName(false);
+
+            function onEdit(e: React.ChangeEvent<HTMLInputElement>) {
+                setLinkName(e.target.value);
+                props.link.name = e.target.value;
+            }
 
             props.link.name = linkName;
 
             return (
                 <Link to={props.link.id}>
                     <div className={`nav-link nav-child-link ${props.editing ? 'editing' : ''} ${editingName ? 'editing-name' : ''}`} onClick={() => { if (!this.state.navHidden) this.mobileToggleNav() }}>
-                        <div className="material-icons">drag_indicator</div>
+                        <div className="highlight-fill"></div>
+                        <div className="material-icons drag-handle">drag_indicator</div>
                         {
                             editingName ?
-                                (<input value={props.link.name} className="name" />) :
-                                (<div className="name">{props.link.name}</div>)
-                        
+                                (
+                                    <div className="input-container">
+                                        <div>
+                                            <input onClick={e => { e.stopPropagation(); e.preventDefault(); }} onChange={onEdit} value={linkName} />
+                                        </div>
+                                    </div>
+                                ) :
+                                (
+                                    <div className="name">{linkName}</div>
+                                )
+
                         }
                         <div className="material-icons edit-icon" onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                        }}>create</div>
+                            setEditingName(!editingName);
+                        }}>{editingName ? 'save' : 'create'}</div>
                         <div className="material-icons delete-icon" onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation();
+                            props.onDelete();
                         }}>delete</div>
                     </div>
                 </Link>
             )
         }).bind(this);
 
-        const EditableNavLinkFolder = ((props: { folder: Folder, id: number, editing: boolean }) => {
+        const EditableNavLinkFolder = ((props: { folder: Folder, id: number, editing: boolean, onDelete: () => void }) => {
             if (props.folder.folded == null) props.folder.folded = true;
             const [heightAuto, setHeightAuto]: [boolean, any] = useState<boolean>(!props.folder.folded);
             const [folded, setFolded]: [boolean, any] = useState<boolean>(props.folder.folded);
             const [unfoldHeight, setUnfoldHeight]: [number, any] = useState<number>(0);
-            const [folding, setFolding]: [boolean, any] = useState<boolean>(false);
+
+            const [editingName, setEditingName]: [boolean, any] = useState(false);
+            const [linkName, setLinkName]: [string, any] = useState(props.folder.name);
+
 
             const [tout, setTout]: [number | null, any] = useState(null);
             const [heightRef, setHeightRef]: [HTMLElement | null, any] = useState<HTMLElement | null>(null);
+
+            function onEdit(e: React.ChangeEvent<HTMLInputElement>) {
+                setLinkName(e.target.value);
+                props.folder.name = e.target.value;
+            }
 
             if (!folded && heightRef != null)
                 if (heightRef.clientHeight != unfoldHeight)
@@ -224,13 +259,11 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                 setFolded(props.folder.folded);
                 if (!folded) {
                     setHeightAuto(false);
-                    setFolding(true);
                     if (tout != null) {
                         clearTimeout(tout);
                     }
                     setTout(setTimeout(() => {
                         setUnfoldHeight(0);
-                        setFolding(false);
                         setTout(null);
                     }, 30))
                 }
@@ -244,22 +277,34 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                 }
             }
 
-            if (folding) {
-                console.log(unfoldHeight)
-            }
-
             return (
                 <div>
                     <div className={`nav-link nav-folder ${folded ? '' : 'open'} ${props.editing ? 'editing' : ''}`} onClick={toggleOpen}>
-                        <div className="material-icons">drag_indicator</div>
-                        <div className="name">{props.folder.name}</div>
+                        <div className="highlight-fill"></div>
+                        <div className="material-icons drag-handle">drag_indicator</div>
+                        {
+                            editingName ?
+                                (
+                                    <div className="input-container">
+                                        <div>
+                                            <input onClick={e => { e.stopPropagation(); e.preventDefault(); }} onChange={onEdit} value={linkName} />
+                                        </div>
+                                    </div>
+                                ) :
+                                (
+                                    <div className="name">{linkName}</div>
+                                )
+
+                        }
                         <div className="material-icons edit-icon" onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                        }}>create</div>
+                            setEditingName(!editingName);
+                        }}>{editingName ? 'save' : 'create'}</div>
                         <div className="material-icons delete-icon" onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation();
+                            props.onDelete();
                         }}>delete</div>
                         <span className="nav-folder-arrow">
                             <i className="material-icons down">keyboard_arrow_down</i>
@@ -283,7 +328,9 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                     animation: 150,
                                     fallbackOnBody: true,
                                     swapThreshold: 0.2,
+                                    disabled: !editing
                                 }}
+                                ref={(e: any) => { if (e != null) e.sortable.options.disabled = !editing }}
                                 onChange={(order: any, sortable: any, evt: any) => {
                                     console.log(order)
                                     _setPages(_pages.map(e => {
@@ -297,7 +344,7 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                 {
                                     props.folder.pages.map((e, i) => (
                                         <div key={i} data-id={e.id}>
-                                            <EditableNavLink editing={props.editing} link={e} />
+                                            <EditableNavLink editing={props.editing} onDelete={() => { props.folder.pages.splice(i, 1); setPages(pages.map((e: any) => e)); }} link={e} />
                                         </div>
                                     ))
                                 }
@@ -322,32 +369,40 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                         animation: 150,
                         fallbackOnBody: true,
                         swapThreshold: 0.2,
+                        disabled: !editing
                     }}
                     onChange={(order: any, sortable: any, evt: any) => {
                         console.log('parent', order, getPageList(order))
                         _setPages(getPageList(order));
                     }}
+                    ref={(e: any) => { if (e != null) e.sortable.options.disabled = !editing }}
                 >
                     {_pages.map((p, i) => {
                         if ((p as Folder).pages == null) {
                             return (
                                 <div key={i} data-id={(p as NavPage).id}>
-                                    <EditableNavLink editing={editing} link={p as NavPage} />
+                                    <EditableNavLink editing={editing} onDelete={() => { pages.splice(i, 1); setPages(pages.map((e: any) => e)); }} link={p as NavPage} />
                                 </div>
                             )
                         }
                         else {
                             return (
-                                <div key={i} data-id={p.id}>
-                                    <EditableNavLinkFolder editing={editing} id={i} folder={p as Folder}></EditableNavLinkFolder>
+                                <div key={i} data-id={p.id} className="folder">
+                                    <EditableNavLinkFolder editing={editing} onDelete={() => { pages.splice(i, 1, ...(p as Folder).pages); setPages(pages.map((e: any) => e)); }} id={i} folder={p as Folder}></EditableNavLinkFolder>
                                 </div>
                             )
                         }
                     })}
                 </Sortable>
-                <div>
-                    <button onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
-                </div>
+                {this.isUserTeacher && (<div className="edit-buttons-container">
+                    <button className="edit" onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
+                    {editing && (<button className="new-folder" onClick={() => {
+                        pages.push({ folded: false, id: '"' + lastFolderID, name: 'Folder', pages: [] });
+                        setPages(pages.map((e: any) => e));
+                        setLastFolderID(lastFolderID + 1);
+                        updatePageDict();
+                    }}>New Folder</button>)}
+                </div>)}
             </div >
         )
     }
@@ -383,9 +438,8 @@ export class Course extends React.Component<CourseProps, CourseStatePrivate> {
                                     <div className="middle">
                                     </div>
                                     <div className="right" onClick={(() => this.setState({ profileOpen: true }))}>
-                                        <this.UserPfp />
                                         <div className="profile-button">
-                                            <div>Profile</div>
+                                            <this.UserPfp />
                                         </div>
                                     </div>
                                 </div>

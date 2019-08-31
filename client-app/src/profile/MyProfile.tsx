@@ -7,6 +7,7 @@ import "./MyProfile.scss";
 import { Scroller } from '../scroller/Scroller';
 import { WebApi } from '../utils/ServerApi';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { Redirect } from 'react-router';
 
 enum Pages {
     None,
@@ -203,6 +204,15 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
         );
     }
 
+    function logOut(){
+        localStorage.removeItem('token');
+        setLoaded(false);
+    }
+
+    if(localStorage.getItem('token') == null){
+        return <Redirect to="/login"/>
+    }
+
     return (
         <div
             className={`fill ${currPage == Pages.None ? 'none-selected' : 'page-selected'}`}>
@@ -218,6 +228,7 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
                                 <div className="profile-nav-link"><span className="material-icons">vpn_key</span>Security</div>
                             </Link>
                             <div className="profile-nav-link" onClick={(() => props.onCloseClicked())}>Back...</div>
+                            <div className="profile-nav-link logout" onClick={(() => logOut())}>Log Out</div>
                         </div>
                     </div>
                 </Scroller>
