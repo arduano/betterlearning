@@ -8,18 +8,29 @@ import { Scroller } from '../scroller/Scroller';
 import { WebApi } from '../utils/ServerApi';
 import { resolveSoa } from 'dns';
 import { AppState } from '../utils/AppState';
+import * as ReactQuill from 'react-quill';
+import '../../node_modules/react-quill/dist/quill.snow.css';
+import { PageComments } from '../../../shared-objects/PageComments';
 
-export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { data: PageData | null, comments: PageComment[] | null }> {
+var Font = ReactQuill.Quill.import('formats/font');
+Font.whitelist = ['Ubuntu', 'Raleway', 'Roboto'];
+ReactQuill.Quill.register(Font, false);
+
+interface WrapperState extends PageComments {
+    data: PageData | null
+}
+
+export class PageWrapper extends React.Component<{ data: Promise<PageData> }, WrapperState> {
     constructor(props: { data: Promise<PageData> }) {
         super(props)
-        this.state = { data: null, comments: null }
+        this.state = { data: null, comments: undefined }
     }
 
     componentWillMount() {
         this.props.data.then(data => {
             this.setState({ data })
             let webapi = new WebApi();
-            webapi.getComments(data.id).then(comments => this.setState({ comments }));
+            webapi.getComments(data.id).then(comments => this.setState({ ...comments }));
         });
     }
 
@@ -40,7 +51,7 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { 
                     comments = this.state.comments.map((c, i) => {
                         if (this.state.data != null) {
                             return (
-                                <CommentComponent comment={c} pageid={this.state.data.id} key={i} />
+                                <CommentComponent comment={c} isReply={false} key={i} />
                             )
                         }
                     });
@@ -52,6 +63,9 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { 
                             {page}
                         </div>
                         <div>
+                            <CommentComposer />
+                        </div>
+                        <div>
                             {comments}
                         </div>
                     </Scroller>
@@ -61,14 +75,28 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, { 
     }
 }
 
-const CommentComponent = (props: { comment: PageComment, pageid: string }) => {
-    const [author, setAuthor]: [UserInfo | null, any] = useState<UserInfo | null>(null);
+
+type BasicCommentProps = {
+    id: string,
+    author: string,
+    time: Date,
+    replies?: {
+        id: string,
+        author: string,
+        time: Date,
+    }[]
+}
+
+function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean }) {
     const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
+
+    const [author, setAuthor]: [UserInfo | null, any] = useState<UserInfo | null>(null);
+    const [comment, setComment]: [PageComment | null, any] = useState<PageComment | null>(null);
     const [liked, setLike]: [boolean, any] = useState<boolean>(false);
     const webapi = new WebApi();
 
-    if (user != null) {
-        let _liked = props.comment.likes.includes(user.id);
+    if (user != null && comment != null) {
+        let _liked = comment.likes.includes(user.id);
         if (_liked != liked)
             setLike(_liked);
     }
@@ -77,22 +105,28 @@ const CommentComponent = (props: { comment: PageComment, pageid: string }) => {
         webapi.getUser(props.comment.author).then(u => setAuthor(u));
     }
 
+    if (comment == null) {
+        webapi.getComment(props.comment.id).then(c => setComment(c));
+    }
+
     const getDateString = (d: Date) => {
         d = new Date(d);
         return d.getDay() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds()
     }
 
     const likeClicked = () => {
-        if (user != null) {
-            if (props.comment.likes.includes(user.id)) {
-                props.comment.likes.splice(props.comment.likes.indexOf(user.id), 1);
-                webapi.unlikeComment(props.pageid, props.comment.id)
-                setLike(false);
+        if (user != null && comment != null) {
+            if (comment.likes.includes(user.id)) {
+                webapi.unlikeComment(props.comment.id).then(() => {
+                    comment.likes.splice(comment.likes.indexOf(user.id), 1);
+                    setLike(false);
+                })
             }
             else {
-                props.comment.likes.push(user.id);
-                webapi.likeComment(props.pageid, props.comment.id)
-                setLike(true);
+                webapi.likeComment(props.comment.id).then(() => {
+                    comment.likes.push(user.id);
+                    setLike(true);
+                })
             }
         }
     }
@@ -108,13 +142,29 @@ const CommentComponent = (props: { comment: PageComment, pageid: string }) => {
                     <span className="comment-date"> - {getDateString(props.comment.time)}</span>
                 </div>
                 <div>
-                    {props.comment.content}
+                    {comment != null ? comment.content : null}
                 </div>
-                <div className={`like-button ${user != null && props.comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
-                    <div className="like-count">{props.comment.likes.length}</div>
+                <div className={`like-button ${user != null && comment != null && comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
+                    <div className="like-count">{comment != null ? comment.likes.length : null}</div>
                     <div className="material-icons thumb-up">thumb_up</div>
                 </div>
             </div>
         </div>
+    )
+}
+
+function CommentComposer(props: {}) {
+    const [data, setData]: [string, any] = useState<string>("");
+
+
+    return (
+        <ReactQuill.default theme="snow" value={data}
+            modules={{
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'clean', 'image'],
+                ],
+            }}
+            onChange={(e) => { console.log(e) }} />
     )
 }

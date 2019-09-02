@@ -9,14 +9,4 @@ export class Pages {
         }
         else return null;
     }
-
-    static likeComment(pid: string, cid: string, user: string){
-        let likes = this.getPage(pid).comments.find(c => c.id == cid).likes
-        if(!likes.includes(user)) likes.push(user);
-    }
-
-    static unlikeComment(pid: string, cid: string, user: string){
-        let likes = this.getPage(pid).comments.find(c => c.id == cid).likes
-        if(likes.includes(user)) likes.splice(likes.indexOf(user), 1);
-    }
 }

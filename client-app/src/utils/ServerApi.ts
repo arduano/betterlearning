@@ -1,3 +1,4 @@
+import { PageComments } from './../../../shared-objects/PageComments';
 import { UserInfo } from './../../../shared-objects/UserInfo';
 import { PageComment } from './../../../shared-objects/PageComment';
 import { AppState } from './AppState';
@@ -43,7 +44,12 @@ export class WebApi {
 
     async getComments(pid: string) {
         let response = await axios.get(WebApi.urlBase + `api1/comments/${pid}`, { headers: this.getAuthHeaders() });
-        return response.data as PageComment[];
+        return response.data as PageComments;
+    }
+
+    async getComment(cid: string) {
+        let response = await axios.get(WebApi.urlBase + `api1/comment/${cid}`, { headers: this.getAuthHeaders() });
+        return response.data as PageComment;
     }
 
     async getUser(uid: string) {
@@ -56,13 +62,13 @@ export class WebApi {
         return response.data as LoggedInUserInfo;
     }
 
-    async likeComment(pid: string, cid: string){
-        let response = await axios.put(WebApi.urlBase + `api1/likes/${pid}/${cid}`, null, { headers: this.getAuthHeaders() });
+    async likeComment(cid: string){
+        let response = await axios.put(WebApi.urlBase + `api1/likes/${cid}`, null, { headers: this.getAuthHeaders() });
         return response.data;
     }
 
-    async unlikeComment(pid: string, cid: string){
-        let response = await axios.delete(WebApi.urlBase + `api1/likes/${pid}/${cid}`, { headers: this.getAuthHeaders() });
+    async unlikeComment(cid: string){
+        let response = await axios.delete(WebApi.urlBase + `api1/likes/${cid}`, { headers: this.getAuthHeaders() });
         return response.data;
     }
 }

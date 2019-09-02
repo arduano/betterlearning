@@ -1,6 +1,7 @@
 import { User } from './../models/User';
 import { Page } from './../models/Page';
 import { Course } from './../models/Course';
+import { Comment } from '../models/Comment';
 
 const Users: User[] = [
     {
@@ -62,24 +63,7 @@ const Pages: Page[] = [
         name: 'Page 1',
         type: 'html',
         data: { html: '<div><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1><h1>Page 1</h1></div>' },
-        comments: [
-            {
-                id: '1',
-                author: '1234',
-                content: 'test comment',
-                time: new Date(),
-                likes: [],
-                replies: []
-            },
-            {
-                id: '2',
-                author: '1234',
-                content: 'hhhhhh',
-                time: new Date(),
-                likes: [],
-                replies: []
-            }
-        ]
+        comments: []
     },
     {
         id: '2',
@@ -87,7 +71,7 @@ const Pages: Page[] = [
         name: 'Page 2',
         type: 'html',
         data: { html: '<h3>Page 2</h3>' },
-        comments: []
+        comments: ['1', '2']
     },
     {
         id: '3',
@@ -95,24 +79,30 @@ const Pages: Page[] = [
         name: 'Page 3 Page 3 Page 3 Page 3 Page 3 Page 3',
         type: 'html',
         data: { html: '<html><head><style>div{background-color:red;}</style></head><body><div>test</div></body></html>' },
-        comments: [
-            {
-                id: '1',
-                author: '1234',
-                content: 'test comment',
-                time: new Date(),
-                likes: ['1234'],
-                replies: []
-            },
-            {
-                id: '2',
-                author: '5678',
-                content: 'hhhhhh',
-                time: new Date(),
-                likes: [],
-                replies: []
-            }
-        ]
+        comments: []
+    }
+]
+
+const Comments: Comment[] = [
+    {
+        id: '1',
+        isReply: false,
+        ownerPage: '2',
+        author: '1234',
+        content: 'test comment',
+        time: new Date(),
+        likes: ['1234'],
+        replies: []
+    },
+    {
+        id: '2',
+        isReply: false,
+        ownerPage: '2',
+        author: '5678',
+        content: 'hhhhhh',
+        time: new Date(),
+        likes: [],
+        replies: []
     }
 ]
 
@@ -120,4 +110,5 @@ export const DB = {
     Users,
     Courses,
     Pages,
+    Comments,
 }
