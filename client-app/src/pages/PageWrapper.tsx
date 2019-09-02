@@ -10,6 +10,7 @@ import { resolveSoa } from 'dns';
 import { AppState } from '../utils/AppState';
 import * as ReactQuill from 'react-quill';
 import '../../node_modules/react-quill/dist/quill.snow.css';
+import './quill.comment.scss';
 import { PageComments } from '../../../shared-objects/PageComments';
 
 var Font = ReactQuill.Quill.import('formats/font');
@@ -74,7 +75,6 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
         }
     }
 }
-
 
 type BasicCommentProps = {
     id: string,
@@ -141,8 +141,7 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean 
                     {author != null && author.name}
                     <span className="comment-date"> - {getDateString(props.comment.time)}</span>
                 </div>
-                <div>
-                    {comment != null ? comment.content : null}
+                <div ref={(e: HTMLDivElement) => { if (comment != null && e != null) e.innerHTML = comment.content }}>
                 </div>
                 <div className={`like-button ${user != null && comment != null && comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
                     <div className="like-count">{comment != null ? comment.likes.length : null}</div>
@@ -158,13 +157,14 @@ function CommentComposer(props: {}) {
 
 
     return (
-        <ReactQuill.default theme="snow" value={data}
-            modules={{
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'clean', 'image'],
-                ],
-            }}
-            onChange={(e) => { console.log(e) }} />
+        <div className="compose-comment">
+            <ReactQuill.default theme="snow" value={data}
+                modules={{
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code', 'clean', 'image'],
+                    ],
+                }}
+                onChange={(e) => { setData(e) }} />
+        </div>
     )
 }

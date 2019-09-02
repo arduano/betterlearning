@@ -1,0 +1,32 @@
+.compose-comment .ql-snow{
+    .ql-editor{
+        color: white;
+        font-family: 'Open Sans';
+        font-size: 16px;
+    }
+
+    .ql-fill{
+        fill: #ccc;
+    }
+
+    .ql-stroke{
+        stroke: #ccc;
+    }
+
+    .ql-picker{
+        color: #ccc;
+    }
+
+    code{
+        background-color: #000;
+    }
+}
+
+@media (max-width: 768px) {
+    .compose-comment .ql-snow{
+        button{
+            width: 40px;
+            height: 30px;
+        }
+    }
+}

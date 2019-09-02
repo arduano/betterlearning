@@ -132,6 +132,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
         const [editing, setEditing]: [boolean, any] = useState(false);
         const [pages, setPages]: [(NavPage | Folder)[], any] = useState([])
         const [lastFolderID, setLastFolderID]: [number, any] = useState(0)
+        const [resetState, setResetState]: [boolean, any] = useState(false);
 
         let _pages: (NavPage | Folder)[] = pages;
         function _setPages(p: (NavPage | Folder)[]) {
@@ -140,7 +141,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
         }
         const [pageDict, setPageDict]: [any, any] = useState(null)
 
-        if (props.pages.length != pages.length && pages.length == 0) {
+        if ((props.pages.length != pages.length && pages.length == 0) || resetState) {
             let pgs: (NavPage | Folder)[] = []
 
             let folderid = lastFolderID;
@@ -163,6 +164,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
             });
             setLastFolderID(folderid);
             setPages(pgs);
+            if(resetState) setResetState(false)
         }
 
         if (pageDict == null && pages.length != 0)
@@ -402,6 +404,10 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                         setLastFolderID(lastFolderID + 1);
                         updatePageDict();
                     }}>New Folder</button>)}
+                    {editing && (<button className="cancel-edit" onClick={() => {
+                        setEditing(false);
+                        setResetState(true);
+                    }}>Cancel</button>)}
                 </div>)}
             </div >
         )

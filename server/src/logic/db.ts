@@ -99,7 +99,7 @@ const Comments: Comment[] = [
         isReply: false,
         ownerPage: '2',
         author: '5678',
-        content: 'hhhhhh',
+        content: '<strong>hhhhhh</strong>',
         time: new Date(),
         likes: [],
         replies: []
