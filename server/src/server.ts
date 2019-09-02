@@ -53,8 +53,6 @@ app.get('/api1/course/:id', m.auth, (req, res) => {
 //Takes { name: string, pass: string }
 //Returns { token: string }
 app.post('/api1/login', (req, res) => {
-    console.log(req.body);
-
     let token = Authentication.passwordLogin(req.body.name, req.body.pass);
     if (token != null)
         res.status(200).send({ token });
@@ -116,6 +114,20 @@ app.get('/api1/comments/:pid', m.auth, m.page('pid'), (req, res) => {
 //Returns comment data
 app.get('/api1/comment/:cid', m.auth, m.comment('cid'), (req, res) => {
     let c: PageComment = reqComment(req);
+    res.status(200).send(c);
+})
+
+//Takes page id and data
+//Posts comment and returns comment data
+app.post('/api1/comment/:pid', m.auth, m.page('pid'), (req, res) => {
+    let c: PageComment = Comments.postComment(req.body.data, req.params.pid, reqUser(req).id);
+    res.status(200).send(c);
+})
+
+//Takes page id, comment id and data
+//Posts reply and returns comment data
+app.post('/api1/reply/:pid/:cid', m.auth, m.page('pid'), m.comment('cid'), (req, res) => {
+    let c: PageComment = Comments.postReply(req.body.data, req.params.cid, req.params.pid, reqUser(req).id);
     res.status(200).send(c);
 })
 

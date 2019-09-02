@@ -62,6 +62,16 @@ export class WebApi {
         return response.data as LoggedInUserInfo;
     }
 
+    async postComment(pid: string, data: string){
+        let response = await axios.post(WebApi.urlBase + `api1/comment/${pid}`, { data }, { headers: this.getAuthHeaders() });
+        return response.data as PageComment;
+    }
+
+    async postReply(pid: string, cid: string, data: string){
+        let response = await axios.post(WebApi.urlBase + `api1/reply/${pid}/${cid}`, { data }, { headers: this.getAuthHeaders() });
+        return response.data as PageComment;
+    }
+
     async likeComment(cid: string){
         let response = await axios.put(WebApi.urlBase + `api1/likes/${cid}`, null, { headers: this.getAuthHeaders() });
         return response.data;

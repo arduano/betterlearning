@@ -12,6 +12,7 @@ import * as ReactQuill from 'react-quill';
 import '../../node_modules/react-quill/dist/quill.snow.css';
 import './quill.comment.scss';
 import { PageComments } from '../../../shared-objects/PageComments';
+import { AssertionError } from 'assert';
 
 var Font = ReactQuill.Quill.import('formats/font');
 Font.whitelist = ['Ubuntu', 'Raleway', 'Roboto'];
@@ -35,6 +36,11 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
         });
     }
 
+    reloadComments() {
+        if (this.state.comments != null)
+            this.setState({ comments: this.state.comments.map(c => c) });
+    }
+
     render() {
         if (this.state.data == null) {
             return <h1>LOADING...</h1>
@@ -49,10 +55,10 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
                 let comments = null;
 
                 if (this.state.comments != null) {
-                    comments = this.state.comments.map((c, i) => {
+                    comments = this.state.comments.sort((a, b) => (new Date(b.time).getTime() - new Date(a.time).getTime())).map((c, i) => {
                         if (this.state.data != null) {
                             return (
-                                <CommentComponent comment={c} isReply={false} key={i} />
+                                <CommentComponent comment={c} isReply={false} key={this.state.comments!.length - i} />
                             )
                         }
                     });
@@ -63,9 +69,19 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
                         <div>
                             {page}
                         </div>
-                        <div>
-                            <CommentComposer />
-                        </div>
+                        {this.state.comments != undefined && (
+                            <div>
+                                <CommentComposer isReply={false} pid={this.state.data.id} posted={(c) => {
+                                    this.state.comments!.push({
+                                        author: c.author,
+                                        id: c.id,
+                                        replies: [],
+                                        time: new Date(c.time)
+                                    });
+                                    this.reloadComments();
+                                }} />
+                            </div>
+                        )}
                         <div>
                             {comments}
                         </div>
@@ -87,7 +103,7 @@ type BasicCommentProps = {
     }[]
 }
 
-function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean }) {
+function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean, fullComment?: PageComment }) {
     const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
     const [author, setAuthor]: [UserInfo | null, any] = useState<UserInfo | null>(null);
@@ -101,12 +117,17 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean 
             setLike(_liked);
     }
 
-    if (author == null) {
+    if (author == null || author.id != props.comment.author) {
         webapi.getUser(props.comment.author).then(u => setAuthor(u));
     }
 
-    if (comment == null) {
-        webapi.getComment(props.comment.id).then(c => setComment(c));
+    if (comment == null || comment.id != props.comment.id) {
+        if (props.fullComment != undefined) {
+            setComment(props.fullComment);
+        }
+        else {
+            webapi.getComment(props.comment.id).then(c => setComment(c));
+        }
     }
 
     const getDateString = (d: Date) => {
@@ -152,19 +173,30 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean 
     )
 }
 
-function CommentComposer(props: {}) {
+function CommentComposer(props: { isReply: boolean, pid: string, comment?: string, posted: (comment: PageComment) => void }) {
+    if (props.isReply && props.comment == undefined) throw new AssertionError();
     const [data, setData]: [string, any] = useState<string>("");
 
+    function onPost() {
+        if(data != "")
+        new WebApi().postComment(props.pid, data).then((c) => {
+            setData("");
+            props.posted(c);
+        });
+    }
 
     return (
         <div className="compose-comment">
-            <ReactQuill.default theme="snow" value={data}
-                modules={{
-                    toolbar: [
-                        ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code', 'clean', 'image'],
-                    ],
-                }}
-                onChange={(e) => { setData(e) }} />
+            <div>
+                <ReactQuill.default theme="snow" value={data}
+                    modules={{
+                        toolbar: [
+                            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code', 'clean', 'image'],
+                        ],
+                    }}
+                    onChange={(e) => { setData(e) }} />
+            </div>
+            <button className="post-button" onClick={onPost}>Post</button>
         </div>
     )
 }

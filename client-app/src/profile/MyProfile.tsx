@@ -187,6 +187,7 @@ function PageWrap(props: { name: string, children: any, backClicked: () => void 
 }
 
 export default function MyProfile(props: { onCloseClicked: () => void }) {
+    const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
     const [currPage, setCurrPage]: [Pages, any] = useState<Pages>(Pages.Account);
     const [loaded, setLoaded]: [boolean, any] = useState<boolean>(false);
 
@@ -206,6 +207,7 @@ export default function MyProfile(props: { onCloseClicked: () => void }) {
 
     function logOut(){
         localStorage.removeItem('token');
+        setUser(null);
         setLoaded(false);
     }
 
