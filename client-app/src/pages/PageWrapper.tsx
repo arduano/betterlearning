@@ -58,7 +58,7 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
                     comments = this.state.comments.sort((a, b) => (new Date(b.time).getTime() - new Date(a.time).getTime())).map((c, i) => {
                         if (this.state.data != null) {
                             return (
-                                <CommentComponent comment={c} isReply={false} key={this.state.comments!.length - i} />
+                                <CommentComponent comment={c} isReply={false} pid={this.state.data.id} key={this.state.comments!.length - i} />
                             )
                         }
                     });
@@ -103,12 +103,13 @@ type BasicCommentProps = {
     }[]
 }
 
-function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean, fullComment?: PageComment }) {
+function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean, pid: string, fullComment?: PageComment }) {
     const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
     const [author, setAuthor]: [UserInfo | null, any] = useState<UserInfo | null>(null);
     const [comment, setComment]: [PageComment | null, any] = useState<PageComment | null>(null);
     const [liked, setLike]: [boolean, any] = useState<boolean>(false);
+    const [replying, setReplying]: [boolean, any] = useState<boolean>(false);
     const webapi = new WebApi();
 
     if (user != null && comment != null) {
@@ -152,23 +153,64 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean,
         }
     }
 
+    let replies = undefined;
+    if (props.comment.replies != null) {
+        replies = props.comment.replies.sort((a, b) => (new Date(b.time).getTime() - new Date(a.time).getTime())).map((r, i) => {
+            return (
+                <CommentComponent comment={r} pid={props.pid} isReply={true} key={props.comment.replies!.length - i} />
+            )
+        });
+    }
+
     return (
-        <div className="comment-wrap">
-            <div>
-                <img className="comment-pfp" src={author != null ? webapi.getPfpUrl(author.id, 256) : ''} />
+        <div>
+            <div className="comment-wrap">
+                <div>
+                    <img className="comment-pfp" src={author != null ? webapi.getPfpUrl(author.id, 256) : ''} />
+                </div>
+                <div className="comment-content">
+                    <div className="comment-user">
+                        {author != null && author.name}
+                        <span className="comment-date"> - {getDateString(props.comment.time)}</span>
+                    </div>
+                    <div ref={(e: HTMLDivElement) => { if (comment != null && e != null) e.innerHTML = comment.content }}>
+                    </div>
+                    <div className="comment-other">
+                        <div className={`like-button ${user != null && comment != null && comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
+                            <div className="like-count">{comment != null ? comment.likes.length : null}</div>
+                            <div className="material-icons thumb-up">thumb_up</div>
+                        </div>
+                        {!props.isReply && (
+                            <button className="reply-button" onClick={() => setReplying(!replying)}>{replying ? 'Cancel' : 'Reply'}</button>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div className="comment-content">
-                <div className="comment-user">
-                    {author != null && author.name}
-                    <span className="comment-date"> - {getDateString(props.comment.time)}</span>
+            {((replies != null && replies.length != 0) || replying) && (
+                <div className="replies-wrap">
+                    <div className="replies-line"></div>
+                    <div className="replies-container">
+                        {replying && (
+                            <div className="reply-compose">
+                                <CommentComposer comment={props.comment.id} pid={props.pid} isReply={true} posted={(r) => {
+                                    if(comment !=null)
+                                    {
+                                        props.comment.replies!.push({
+                                            author: r.author,
+                                            id: r.id,
+                                            time: new Date(r.time)
+                                        });
+                                        setReplying(false);
+                                    }
+                                }} />
+                            </div>
+                        )}
+                        {
+                            replies
+                        }
+                    </div>
                 </div>
-                <div ref={(e: HTMLDivElement) => { if (comment != null && e != null) e.innerHTML = comment.content }}>
-                </div>
-                <div className={`like-button ${user != null && comment != null && comment.likes.includes(user.id) ? 'liked' : ''}`} onClick={likeClicked}>
-                    <div className="like-count">{comment != null ? comment.likes.length : null}</div>
-                    <div className="material-icons thumb-up">thumb_up</div>
-                </div>
-            </div>
+            )}
         </div>
     )
 }
@@ -178,15 +220,23 @@ function CommentComposer(props: { isReply: boolean, pid: string, comment?: strin
     const [data, setData]: [string, any] = useState<string>("");
 
     function onPost() {
-        if(data != "")
-        new WebApi().postComment(props.pid, data).then((c) => {
-            setData("");
-            props.posted(c);
-        });
+        if (data != "")
+            if (props.isReply) {
+                new WebApi().postReply(props.pid, props.comment!, data).then((c) => {
+                    setData("");
+                    props.posted(c);
+                });
+            }
+            else {
+                new WebApi().postComment(props.pid, data).then((c) => {
+                    setData("");
+                    props.posted(c);
+                });
+            }
     }
 
     return (
-        <div className="compose-comment">
+        <div className={`compose-comment ${props.isReply ? 'reply' : ''}`}>
             <div>
                 <ReactQuill.default theme="snow" value={data}
                     modules={{

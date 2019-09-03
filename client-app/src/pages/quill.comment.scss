@@ -56,6 +56,12 @@
     }
 }
 
+.compose-comment.reply{
+    .post-button{
+        margin-left: 20px;
+    }
+}
+
 @media (max-width: 768px) {
     .compose-comment .ql-snow{
         button{

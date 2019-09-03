@@ -92,10 +92,20 @@ const Comments: Comment[] = [
         content: 'test comment',
         time: new Date(),
         likes: ['1234'],
-        replies: []
+        replies: ['3']
     },
     {
         id: '2',
+        isReply: false,
+        ownerPage: '2',
+        author: '5678',
+        content: '<strong>hhhhhh</strong>',
+        time: new Date(),
+        likes: [],
+        replies: []
+    },
+    {
+        id: '3',
         isReply: false,
         ownerPage: '2',
         author: '5678',

@@ -59,9 +59,63 @@
     margin-top: 2px;
 }
 
+.comment-other{
+    display: flex;
+    align-items: center;
+}
+
 .comment-wrap{
     p{
         padding: 0px;
         margin: 0px;
     }
+
+    code{
+        background-color: #000;
+        border-radius: 4px;
+        padding: 0 5px;
+    }
+}
+
+.replies-wrap{
+    display: flex;
+    width: 100%;
+}
+
+.replies-line{
+    margin-left: 40px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: -10px;
+    width: 2px;
+    background-color: #ccc;
+}
+
+.replies-container{
+    width: 100%;
+    .reply-compose{
+        margin-left: -10px;
+    }
+}
+
+.reply-button{
+    background-color: #151515;
+    border: none;
+    outline: none;
+    color: #eee;
+    font-size: 14px;
+    font-family: 'Roboto';
+    padding: 5px;
+    width: 70px;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+.reply-button:hover{
+    background: #333;
+}
+.reply-button:active{
+    transform: translateY(5px);
 }
