@@ -1,3 +1,4 @@
+import { Course } from './models/Course';
 import { PageComments } from './../../shared-objects/PageComments';
 import { UserInfo } from './../../shared-objects/UserInfo';
 import { Users } from './logic/users';
@@ -31,6 +32,7 @@ app.use(express.json())
 const reqUser = (req) => (req as any).user as User;
 const reqPage = (req) => (req as any).page as Page;
 const reqComment = (req) => (req as any).comment as Comment;
+const reqCourse = (req) => (req as any).course as Course;
 
 app.get('/', (req, res) => {
     res.send('h');
@@ -79,6 +81,13 @@ app.get('/api1/page/:cid/:pid', m.auth, (req, res) => {
         data: page.data
     }
     res.status(200).send(p);
+})
+
+//Takes course id
+//Makes new page, Returns PageData
+app.post('/api1/page/:cid', m.auth, m.course('cid', true), (req, res) => {
+    let page = Pages.createPage(reqCourse(req).id);
+    res.status(200).send(page);
 })
 
 //Takes page id
