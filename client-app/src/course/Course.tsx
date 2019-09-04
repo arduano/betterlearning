@@ -164,7 +164,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
             });
             setLastFolderID(folderid);
             setPages(pgs);
-            if(resetState) setResetState(false)
+            if (resetState) setResetState(false)
         }
 
         if (pageDict == null && pages.length != 0)
@@ -397,17 +397,33 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                     })}
                 </Sortable>
                 {this.isUserTeacher && (<div className="edit-buttons-container">
-                    <button className="edit" onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
-                    {editing && (<button className="new-folder" onClick={() => {
-                        pages.push({ folded: false, id: '"' + lastFolderID, name: 'Folder', pages: [] });
-                        setPages(pages.map((e: any) => e));
-                        setLastFolderID(lastFolderID + 1);
-                        updatePageDict();
-                    }}>New Folder</button>)}
-                    {editing && (<button className="cancel-edit" onClick={() => {
-                        setEditing(false);
-                        setResetState(true);
-                    }}>Cancel</button>)}
+                    <div>
+                        <button className="edit" onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
+                        {editing && (<button className="cancel-edit" onClick={() => {
+                            setEditing(false);
+                            setResetState(true);
+                        }}>Cancel</button>)}
+                    </div>
+                    {editing && (
+                        <div>
+                            <button className="new-folder" onClick={() => {
+                                pages.push({ folded: false, id: '@' + lastFolderID, name: 'Folder', pages: [] });
+                                setPages(pages.map((e: any) => e));
+                                setLastFolderID(lastFolderID + 1);
+                                updatePageDict();
+                            }}>New Folder</button>
+                            <button className="new-page" onClick={() => {
+                                let page = this.webapi!.createPage(this.props.match.params.id);
+                                page.then(p => {
+                                    pages.push({ id: p.id, name: p.name });
+                                    this.pageQueries[p.id] = page;
+                                    setPages(pages.map((e: any) => e));
+                                    setLastFolderID(lastFolderID + 1);
+                                    updatePageDict();
+                                })
+                            }}>New Page</button>
+                        </div>
+                    )}
                 </div>)}
             </div >
         )

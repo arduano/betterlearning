@@ -88,7 +88,7 @@ const course = (arg: string, admin?: boolean) => {
             return;
         }
         if (admin) {
-            if (!reqCourse(req).admins.includes(reqUser(req).id)) {
+            if (!course.admins.includes(reqUser(req).id)) {
                 res.status(403).send('insufficient user permissions');
                 return;
             }

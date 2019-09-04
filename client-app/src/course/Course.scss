@@ -98,9 +98,6 @@ $transition-fade-height: 50px;
 }
 
 .edit-buttons-container{
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
     button{
         background-color: #222;
         border: none;
@@ -113,6 +110,7 @@ $transition-fade-height: 50px;
         color: #ccc;
         outline: none;
         transition: transform 0.1s;
+        flex: 0 1 120px;
     }
     button:hover{
         background-color: #333;
@@ -121,13 +119,12 @@ $transition-fade-height: 50px;
     button:active{
         transform: translateY(5px);
     }
+}
 
-    .edit{
-        flex: 0 1 100px;   
-    }
-    .new-folder{
-        flex: 0 1 120px;
-    }
+.edit-buttons-container > div{
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
