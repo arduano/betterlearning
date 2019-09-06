@@ -1,3 +1,4 @@
+import { ModifyCourseData } from './../../shared-objects/CourseState';
 import { Course } from './models/Course';
 import { PageComments } from './../../shared-objects/PageComments';
 import { UserInfo } from './../../shared-objects/UserInfo';
@@ -100,7 +101,7 @@ app.get('/api1/comments/:pid', m.auth, m.page('pid'), (req, res) => {
             if (comment == null) return null;
             let replies = comment.replies.map(r => {
                 let reply = Comments.getComment(r)
-                if(reply == null) return null;
+                if (reply == null) return null;
                 return {
                     id: reply.id,
                     author: reply.author,
@@ -140,6 +141,15 @@ app.post('/api1/reply/:pid/:cid', m.auth, m.page('pid'), m.comment('cid'), (req,
     res.status(200).send(c);
 })
 
+//Takes course id, ModifyCourseData
+//Returns CourseState
+app.post('/api1/nav/:cid', m.auth, m.course('cid', true), (req, res) => {
+    let c = Courses.modifyCourseData(reqCourse(req).id, req.body);
+    if (c == null)
+        res.status(404).send('course not found');
+    res.status(200).send(c);
+})
+
 //Takes page id and comment id
 //likes the comment
 app.put('/api1/likes/:cid', m.auth, m.comment('cid'), (req, res) => {
@@ -152,7 +162,7 @@ app.put('/api1/likes/:cid', m.auth, m.comment('cid'), (req, res) => {
 app.delete('/api1/likes/:cid', m.auth, m.comment('cid'), (req, res) => {
     Comments.unlikeComment(req.params.cid, reqUser(req).id);
     res.status(200).send('success');
-    
+
 })
 
 //Takes basic authentication with no extra data

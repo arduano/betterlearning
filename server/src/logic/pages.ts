@@ -29,4 +29,8 @@ export class Pages {
         course.pages.push(page.id);
         return page;
     }
+
+    static changePageName(id: string, name: string){
+        DB.Pages.find(p => p.id == id).name = name;        
+    }
 }

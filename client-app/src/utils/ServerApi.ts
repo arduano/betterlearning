@@ -1,3 +1,4 @@
+import { ModifyCourseData } from './../../../shared-objects/CourseState';
 import { PageComments } from './../../../shared-objects/PageComments';
 import { UserInfo } from './../../../shared-objects/UserInfo';
 import { PageComment } from './../../../shared-objects/PageComment';
@@ -86,4 +87,9 @@ export class WebApi {
         let response = await axios.delete(WebApi.urlBase + `api1/likes/${cid}`, { headers: this.getAuthHeaders() });
         return response.data;
     }
+
+    async modifyCourse(cid: string, data: ModifyCourseData) {
+        let response = await axios.post(WebApi.urlBase + `api1/nav/${cid}`, data, { headers: this.getAuthHeaders() });
+        return response.data as CourseState;
+    } 
 }

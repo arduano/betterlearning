@@ -8,9 +8,16 @@ export interface NavPage {
     name: string
 }
 
+export type NavState = (NavPage | NavPageFolder)[]
+
 export interface CourseState {
     courseName: string,
     courseId: string,
-    pages: (NavPage | NavPageFolder)[],
+    pages: NavState,
     admins: string[]
+}
+
+export interface ModifyCourseData {
+    courseName: string,
+    pages: NavState
 }

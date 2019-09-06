@@ -4,7 +4,7 @@ import { Scroller } from "../scroller/Scroller";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, NavLink } from "react-router-dom";
 import { WebApi } from "../utils/ServerApi";
-import { CourseState, NavPage, NavPageFolder } from '../../../shared-objects/CourseState';
+import { CourseState, NavPage, NavPageFolder, ModifyCourseData } from '../../../shared-objects/CourseState';
 import { AppState } from "../utils/AppState";
 import { useGlobal, Component } from 'reactn';
 import { PageWrapper } from "../pages/PageWrapper";
@@ -398,7 +398,19 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                 </Sortable>
                 {this.isUserTeacher && (<div className="edit-buttons-container">
                     <div>
-                        <button className="edit" onClick={() => setEditing(!editing)}>{editing ? 'Save' : 'Edit'}</button>
+                        <button className="edit" onClick={() => {
+                            if(editing){
+                                let data: ModifyCourseData = {
+                                    courseName: this.state.courseName,
+                                    pages: pages
+                                }
+                                this.webapi!.modifyCourse(this.props.match.params.id, data).then(c => {
+                                    this.setState(c);
+                                })
+                            }
+                            setEditing(!editing)
+                        }
+                        }>{editing ? 'Save' : 'Edit'}</button>
                         {editing && (<button className="cancel-edit" onClick={() => {
                             setEditing(false);
                             setResetState(true);
