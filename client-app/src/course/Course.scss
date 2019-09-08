@@ -78,12 +78,26 @@ $transition-fade-height: 50px;
 }
 
 .open-nav-button {
-    background-color: #111;
+    color: #ccc;
+    font-size: 35px;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
     width: $top-bar-height;
     height: $top-bar-height;
     display: none;
 }
 
+.nav-back-button {
+    color: #ccc;
+    font-size: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    width: $top-bar-height;
+    height: $top-bar-height;
+}
 .left-nav {
     height: 100vh;
     background-color: rgb(44, 44, 44);
@@ -149,7 +163,7 @@ $transition-fade-height: 50px;
     }
 
     .open-nav-button {
-        display: block;
+        display: flex;
     }
 }
 
@@ -158,6 +172,7 @@ $transition-fade-height: 50px;
     flex: 0 0 $top-bar-height;
     box-shadow: black 0 0 5px;
     z-index: 101;
+    display: flex;
 }
 
 .nav-content {

@@ -1,4 +1,4 @@
-.compose-comment .ql-snow {
+.compose-page .ql-snow, .compose-comment .ql-snow {
     .ql-editor {
         color: white;
         font-family: "Open Sans";
@@ -23,16 +23,22 @@
 }
 
 .compose-comment .ql-container.ql-snow,
-.compose-comment .ql-toolbar.ql-snow {
+.compose-comment .ql-toolbar.ql-snow,
+.compose-page .ql-container.ql-snow,
+.compose-page .ql-toolbar.ql-snow {
     border-left: none;
     border-right: none;
+}
+
+.compose-page .ql-toolbar.ql-snow{
+    border-top: none;
 }
 
 .compose-comment .ql-container.ql-snow {
     background-color: #0003;
 }
 
-.compose-comment {
+.compose-page, .compose-comment {
     .post-button {
         background-color: #111;
         border: none;
@@ -64,7 +70,8 @@
 }
 
 @media (max-width: 768px) {
-    .compose-comment .ql-snow {
+    .compose-comment .ql-snow,
+    .compose-page .ql-snow {
         button {
             width: 40px;
             height: 30px;

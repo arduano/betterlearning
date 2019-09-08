@@ -2,7 +2,7 @@ import React, { RefObject, useState } from "react";
 import './Course.scss';
 import { Scroller } from "../scroller/Scroller";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { BrowserRouter as Router, Switch, Route, Link, Redirect, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, Redirect, NavLink, match, RouteComponentProps } from "react-router-dom";
 import { WebApi } from "../utils/ServerApi";
 import { CourseState, NavPage, NavPageFolder, ModifyCourseData } from '../../../shared-objects/CourseState';
 import { AppState } from "../utils/AppState";
@@ -11,6 +11,7 @@ import { PageWrapper } from "../pages/PageWrapper";
 import { PageData } from "../../../shared-objects/PageData";
 import { LoggedInUserInfo } from "../../../shared-objects/UserInfo";
 import MyProfile from "../profile/MyProfile";
+import { StaticContext } from "react-router";
 const Sortable = require('react-sortablejs');
 
 interface CourseStatePrivate extends CourseState {
@@ -18,7 +19,7 @@ interface CourseStatePrivate extends CourseState {
     profileOpen: boolean
 }
 
-type CourseProps = { match: { params: { id: string } } };
+interface CourseProps extends RouteComponentProps<any, StaticContext, any> { };
 export class Course extends Component<CourseProps, CourseStatePrivate> {
     webapi: WebApi | null = null;
 
@@ -112,7 +113,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
             }
         }
         console.log(this.state.pages);
-        return <Redirect to={`/course/${props.match.params.courseid}/${firstPage}`} />
+        return <Redirect to={`${this.props.match.url}/${firstPage}`} />
     }
 
     UserPfp(props: {}) {
@@ -201,7 +202,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
             props.link.name = linkName;
 
             return (
-                <Link to={props.link.id}>
+                <Link to={`${this.props.match.url}/${props.link.id}`}>
                     <div className={`nav-link nav-child-link ${props.editing ? 'editing' : ''} ${editingName ? 'editing-name' : ''}`} onClick={() => { if (!this.state.navHidden) this.mobileToggleNav() }}>
                         <div className="highlight-fill"></div>
                         <div className="material-icons drag-handle">drag_indicator</div>
@@ -448,58 +449,69 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
 
     renderMainView() {
         return (
-            <Router>
-                <Route render={(location: any) => {
-                    location = location.location;
-                    return (
-                        <div className="main">
-                            <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
-                                <div className="nav-header">
-                                </div>
-                                <div className="nav-content">
-                                    <Scroller>
-                                        <div className="nav-content">
-                                            <this.EditableNavLinks pages={this.state.pages} />
-                                        </div>
-                                    </Scroller>
+            //<Router>
+            //    <Route render={(location: any) => {
+            //		console.log('router 2 render', location);
+            //        location = location.location;
+            //        return (
+            <div className="main">
+                <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
+                    <div className="nav-header">
+                        <Link to="/courses">
+                            <div className="nav-back-button material-icons" onClick={this.mobileToggleNav}>
+                                <div>
+                                    arrow_back
                                 </div>
                             </div>
-                            <div className="right-content">
-                                <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={this.mobileToggleNav}>
-                                </div>
-                                <div className="top-bar">
-                                    <div className="left">
-                                        <div className="open-nav-button" onClick={this.mobileToggleNav}>
-                                        </div>
-                                    </div>
-                                    <div className="middle">
-                                    </div>
-                                    <div className="right" onClick={(() => this.setState({ profileOpen: true }))}>
-                                        <div className="profile-button">
-                                            <this.UserPfp />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="content">
-                                    <TransitionGroup>
-                                        <CSSTransition
-                                            key={location.pathname}
-                                            classNames="fade"
-                                            timeout={400}
-                                        >
-                                            <Switch location={location}>
-                                                <Route exact path="/course/:courseid" component={this.OpenFirstPage} />
-                                                <Route exact path="/course/:courseid/:pageid" component={this.PageFeeder} />
-                                                <Route render={() => <div>Not Found</div>} />
-                                            </Switch>
-                                        </CSSTransition>
-                                    </TransitionGroup>
+                        </Link>
+                    </div>
+                    <div className="nav-content">
+                        <Scroller>
+                            <div className="nav-content">
+                                <this.EditableNavLinks pages={this.state.pages} />
+                            </div>
+                        </Scroller>
+                    </div>
+                </div>
+                <div className="right-content">
+                    <div className={`black-overlay ${this.state.navHidden ? '' : 'visible'}`} onClick={this.mobileToggleNav}>
+                    </div>
+                    <div className="top-bar">
+                        <div className="left">
+                            <div className="open-nav-button material-icons" onClick={this.mobileToggleNav}>
+                                <div>
+                                    menu
                                 </div>
                             </div>
                         </div>
-                    )
-                }} />
-            </Router>
+                        <div className="middle">
+                        </div>
+                        <div className="right" onClick={(() => this.setState({ profileOpen: true }))}>
+                            <div className="profile-button">
+                                <this.UserPfp />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="content">
+                        <TransitionGroup>
+                            <CSSTransition
+                                key={this.props.location.pathname}
+                                classNames="fade"
+                                timeout={400}
+                            >
+                                <div>
+                                    <Route exact path={`${this.props.match.url}/`} component={this.OpenFirstPage} />
+                                    <Route path={`${this.props.match.url}/:pageid`} component={this.PageFeeder} />
+                                    <Route render={(p) => (<div>Not Found</div>)} />
+                                </div>
+                            </CSSTransition>
+                        </TransitionGroup>
+                    </div>
+                </div>
+            </div>
+            //            )
+            //        }} />
+            //    </Router>
         )
     }
 

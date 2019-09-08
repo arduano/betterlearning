@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { History, Location } from 'history';
 import PropTypes from "prop-types";
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-	Link,
-	Redirect
-} from "react-router-dom";
 import logo from './logo.svg';
 import './App.css';
 import { Scroller } from './scroller/Scroller';
@@ -20,24 +13,23 @@ import { Courses } from './courses/Courses';
 import { LoggedInUserInfo } from '../../shared-objects/UserInfo';
 import { WebApi } from './utils/ServerApi';
 import MyProfile from './profile/MyProfile';
+import { Redirect, Router, Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
 	const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
+	console.log('render')
 	return (
 		<div className="App">
-			<Router>
-				<Route render={(args: any) => {
-					return (
-						<Switch location={args.location}>
-							<AuthRoute exact path="/courses" component={Courses} />
-							<Route exact path="/login" component={Login} />
-							<AuthRoute path="/profile" component={MyProfile} />
-							<AuthRoute path="/course/:id" component={Course} />
-						</Switch>
-					)
-				}} />
-			</Router>
+			<BrowserRouter>
+				<div>
+					<AuthRoute exact path="/courses" component={Courses} />
+					<Route exact path="/login" component={Login} />
+					<AuthRoute path="/profile" component={MyProfile} />
+					<AuthRoute path="/course/:id" component={Course} />
+				</div>
+			</BrowserRouter>
 		</div>
 	);
 }
