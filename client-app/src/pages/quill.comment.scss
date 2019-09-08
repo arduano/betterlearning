@@ -1,44 +1,45 @@
-.compose-comment .ql-snow{
-    .ql-editor{
+.compose-comment .ql-snow {
+    .ql-editor {
         color: white;
-        font-family: 'Open Sans';
+        font-family: "Open Sans";
         font-size: 16px;
     }
 
-    .ql-fill{
+    .ql-fill {
         fill: #ccc;
     }
 
-    .ql-stroke{
+    .ql-stroke {
         stroke: #ccc;
     }
 
-    .ql-picker{
+    .ql-picker {
         color: #ccc;
     }
 
-    code{
+    code {
         background-color: #000;
     }
 }
 
-.compose-comment .ql-container.ql-snow, .compose-comment .ql-toolbar.ql-snow{
+.compose-comment .ql-container.ql-snow,
+.compose-comment .ql-toolbar.ql-snow {
     border-left: none;
     border-right: none;
 }
 
-.compose-comment .ql-container.ql-snow{
+.compose-comment .ql-container.ql-snow {
     background-color: #0003;
 }
 
-.compose-comment{
-    .post-button{
+.compose-comment {
+    .post-button {
         background-color: #111;
         border: none;
         outline: none;
         color: #eee;
         font-size: 16px;
-        font-family: 'Roboto';
+        font-family: "Roboto";
         padding: 5px;
         width: 100px;
         border-radius: 5px;
@@ -48,25 +49,63 @@
         cursor: pointer;
         transition: all 0.1s;
     }
-    .post-button:hover{
+    .post-button:hover {
         background: #333;
     }
-    .post-button:active{
+    .post-button:active {
         transform: translateY(5px);
     }
 }
 
-.compose-comment.reply{
-    .post-button{
+.compose-comment.reply {
+    .post-button {
         margin-left: 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .compose-comment .ql-snow{
-        button{
+    .compose-comment .ql-snow {
+        button {
             width: 40px;
             height: 30px;
         }
     }
+}
+
+.ql-font.ql-picker{
+    width: 150px !important;
+}
+
+.ql-font span[data-value="Open-Sans"]::before,
+.ql-picker-options span[data-value="Open-Sans"]::before {
+    font-family: "Open Sans";
+    content: "Open Sans" !important;
+}
+.ql-font span[data-value="Impact"]::before,
+.ql-picker-options span[data-value="Impact"]::before {
+    font-family: "Impact";
+    content: "Impact" !important;
+}
+.ql-font span[data-value="Roboto"]::before,
+.ql-picker-options span[data-value="Roboto"]::before {
+    font-family: "Roboto";
+    content: "Roboto" !important;
+}
+.ql-font span[data-value="Comic-Sans-MS"]::before,
+.ql-picker-options span[data-value="Comic-Sans-MS"]::before {
+    font-family: "Comic Sans MS";
+    content: "Comic Sans MS" !important;
+}
+
+.ql-font-Open-Sans {
+    font-family: "Open Sans";
+}
+.ql-font-Impact {
+    font-family: "Impact";
+}
+.ql-font-Roboto {
+    font-family: "Roboto";
+}
+.ql-font-Comic-Sans-MS {
+    font-family: "Comic Sans MS";
 }

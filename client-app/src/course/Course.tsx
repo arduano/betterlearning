@@ -92,7 +92,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
     PageFeeder(props: { match: { params: { pageid: string } } }) {
         let data = this.pageQueries[props.match.params.pageid];
         if (data == null) return <div></div>
-        return <div style={{ height: "100%" }}><PageWrapper data={this.pageQueries[props.match.params.pageid]} /></div>
+        return <div style={{ height: "100%" }}><PageWrapper admins={this.state.admins} data={this.pageQueries[props.match.params.pageid]} /></div>
     }
 
     OpenFirstPage(props: { match: { params: { courseid: string } } }) {
@@ -359,7 +359,12 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
         }).bind(this);
 
         return (
-            <div>
+            <div className="side-nav-content">
+                {editing ? (
+                    <input className='course-name' value={this.state.courseName} onChange={e => this.setState({ courseName: e.target.value })} />
+                ) : (
+                        <div className='course-name'>{this.state.courseName}</div>
+                    )}
                 <Sortable
                     tag="div"
                     options={{
@@ -399,7 +404,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                 {this.isUserTeacher && (<div className="edit-buttons-container">
                     <div>
                         <button className="edit" onClick={() => {
-                            if(editing){
+                            if (editing) {
                                 let data: ModifyCourseData = {
                                     courseName: this.state.courseName,
                                     pages: pages
@@ -454,8 +459,6 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                                 <div className="nav-content">
                                     <Scroller>
                                         <div className="nav-content">
-                                            <div className='course-name'>{this.state.courseName}</div>
-                                            {/*<this.NavLinks pages={this.state.pages} parent={this} />*/}
                                             <this.EditableNavLinks pages={this.state.pages} />
                                         </div>
                                     </Scroller>

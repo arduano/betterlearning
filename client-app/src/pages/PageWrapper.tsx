@@ -2,7 +2,7 @@ import { PageData } from '../../../shared-objects/PageData';
 import { PageComment } from '../../../shared-objects/PageComment';
 import { UserInfo, LoggedInUserInfo } from '../../../shared-objects/UserInfo';
 import React, { useState } from 'react';
-import { useGlobal } from 'reactn';
+import { useGlobal, Component } from 'reactn';
 import { HTMLPage } from './HTMLPage';
 import { Scroller } from '../scroller/Scroller';
 import { WebApi } from '../utils/ServerApi';
@@ -13,19 +13,21 @@ import '../../node_modules/react-quill/dist/quill.snow.css';
 import './quill.comment.scss';
 import { PageComments } from '../../../shared-objects/PageComments';
 import { AssertionError } from 'assert';
+import { throwStatement } from '@babel/types';
 
 var Font = ReactQuill.Quill.import('formats/font');
-Font.whitelist = ['Ubuntu', 'Raleway', 'Roboto'];
+Font.whitelist = ['Open-Sans', 'Impact', 'Roboto', 'Comic-Sans-MS'];
 ReactQuill.Quill.register(Font, false);
 
 interface WrapperState extends PageComments {
     data: PageData | null
+    editing: boolean
 }
 
-export class PageWrapper extends React.Component<{ data: Promise<PageData> }, WrapperState> {
-    constructor(props: { data: Promise<PageData> }) {
+export class PageWrapper extends React.Component<{ data: Promise<PageData>, admins: string[] }, WrapperState> {
+    constructor(props: { data: Promise<PageData>, admins: string[] }) {
         super(props)
-        this.state = { data: null, comments: undefined }
+        this.state = { data: null, comments: undefined, editing: false }
     }
 
     componentWillMount() {
@@ -49,7 +51,36 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
             if (this.state != null) {
                 let page = null;
                 if (this.state.data.type == 'html') {
-                    page = (<HTMLPage {...this.state.data.data} />)
+                    if (!this.state.editing) {
+                        page = (<HTMLPage {...this.state.data.data} />)
+                    }
+                    else {
+                        page = (
+                            <ReactQuill.default theme="snow" value={this.state.data!.data.html}
+                                modules={{
+                                    toolbar: [
+                                        ['bold', 'italic', 'underline', 'strike', 'link'],        // toggled buttons
+                                        ['blockquote', 'code-block'],
+                                        ['video', 'formula', 'image'],
+                                        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                        [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                                        [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                                        [{ 'direction': 'rtl' }],                         // text direction
+
+                                        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                                        [{ 'font': ['Open-Sans', 'Impact', 'Roboto', 'Comic-Sans-MS'] }],
+                                        [{ 'align': [] }],
+
+                                        ['clean'],                                         // remove formatting button
+                                    ],
+                                }}
+                                onChange={(e) => { this.state.data!.data.html = e }} />
+                        )
+                    }
                 }
 
                 let comments = null;
@@ -69,6 +100,7 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData> }, Wr
                         <div>
                             {page}
                         </div>
+                        <button className="edit-page-button" onClick={() => this.setState({ editing: !this.state.editing })}>{this.state.editing ? 'Save' : 'Edit'}</button>
                         {this.state.comments != undefined && (
                             <div>
                                 <CommentComposer isReply={false} pid={this.state.data.id} posted={(c) => {
@@ -193,8 +225,7 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean,
                         {replying && (
                             <div className="reply-compose">
                                 <CommentComposer comment={props.comment.id} pid={props.pid} isReply={true} posted={(r) => {
-                                    if(comment !=null)
-                                    {
+                                    if (comment != null) {
                                         props.comment.replies!.push({
                                             author: r.author,
                                             id: r.id,

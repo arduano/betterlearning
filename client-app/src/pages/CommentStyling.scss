@@ -119,3 +119,27 @@
 .reply-button:active{
     transform: translateY(5px);
 }
+
+.edit-page-button{
+    background-color: #151515;
+    border: none;
+    outline: none;
+    color: #eee;
+    font-size: 14px;
+    font-family: 'Roboto';
+    padding: 5px;
+    width: 70px;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: all 0.1s;
+    margin-bottom: 10px;
+}
+.edit-page-button:hover{
+    background: #333;
+}
+.edit-page-button:active{
+    transform: translateY(5px);
+}
+
