@@ -31,7 +31,8 @@ const auth = (req, res, next) => {
     req.user = user;
     next();
 }
-const page = (arg: string) => {
+const page = (arg: string, admin?: boolean) => {
+    if (admin == undefined) admin = false;
     return (req, res, next) => {
         let pid = req.params[arg];
         let page = Pages.getPage(pid);
@@ -42,6 +43,12 @@ const page = (arg: string) => {
         if (!((req as any).user as User).courses.map(c => c.id).includes(page.courseId)) {
             res.status(403).send('user doesn\'t have access to the course');
             return;
+        }
+        if (admin) {
+            if (!DB.Courses.find(c => c.id == page.courseId).admins.includes(reqUser(req).id)) {
+                res.status(403).send('insufficient user permissions');
+                return;
+            }
         }
         req.page = page;
         next();

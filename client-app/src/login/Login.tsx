@@ -69,7 +69,6 @@ export function Login(props: {}) {
                 {
                     values.errorMessage != '' && (<div>{values.errorMessage}</div>)
                 }
-                I'll fix the style of this page later
             </div>
         </div>
     );

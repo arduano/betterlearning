@@ -13,22 +13,23 @@ import { Courses } from './courses/Courses';
 import { LoggedInUserInfo } from '../../shared-objects/UserInfo';
 import { WebApi } from './utils/ServerApi';
 import MyProfile from './profile/MyProfile';
-import { Redirect, Router, Route } from 'react-router';
+import { Redirect, Router, Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
 	const [user, setUser]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
 
 	console.log('render')
+    console.log('returned null');
 	return (
 		<div className="App">
 			<BrowserRouter>
-				<div>
+				<Switch>
 					<AuthRoute exact path="/courses" component={Courses} />
 					<Route exact path="/login" component={Login} />
 					<AuthRoute path="/profile" component={MyProfile} />
 					<AuthRoute path="/course/:id" component={Course} />
-				</div>
+				</Switch>
 			</BrowserRouter>
 		</div>
 	);
@@ -49,9 +50,8 @@ function AuthRoute(props: { path: string, component: any, exact?: boolean }) {
 			}));
 		}
 
-		return <h1>Loading...</h1>
+		return <Route exact={props.exact} component={() => (<h1>Loading...</h1>)} path={props.path} />
 	}
-	console.log('returned', user)
 	return <Route exact={props.exact} component={props.component} path={props.path} />
 }
 

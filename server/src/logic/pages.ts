@@ -33,4 +33,8 @@ export class Pages {
     static changePageName(id: string, name: string){
         DB.Pages.find(p => p.id == id).name = name;        
     }
+
+    static updatePage(id: string, data: string){
+        DB.Pages.find(p => p.id == id).data.html = data;        
+    }
 }

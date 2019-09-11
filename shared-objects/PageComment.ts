@@ -3,7 +3,7 @@ export interface PageComment {
     ownerPage: string,
     isReply: boolean,
     author: string,
-    time: Date,
+    time: string,
     content: string,
     likes: string[]
     replies: string[],

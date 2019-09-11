@@ -112,7 +112,6 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                 break;
             }
         }
-        console.log(this.state.pages);
         return <Redirect to={`${this.props.match.url}/${firstPage}`} />
     }
 
@@ -124,6 +123,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
     }
 
     EditableNavLinks(props: { pages: (NavPage | NavPageFolder)[] }) {
+        console.log('pgs', props.pages)
         interface Folder extends NavPageFolder {
             folded: boolean,
             id: string
@@ -131,18 +131,20 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
 
         const [user, _]: [LoggedInUserInfo | null, any] = useGlobal<AppState>('signedInUser');
         const [editing, setEditing]: [boolean, any] = useState(false);
-        const [pages, setPages]: [(NavPage | Folder)[], any] = useState([])
+        const [pages, setPages]: [(NavPage | Folder)[] | null, any] = useState<(NavPage | Folder)[] | null>(null)
         const [lastFolderID, setLastFolderID]: [number, any] = useState(0)
+        const [prevPgsLen, setprevPgsLen]: [number, any] = useState(0)
         const [resetState, setResetState]: [boolean, any] = useState(false);
 
-        let _pages: (NavPage | Folder)[] = pages;
+        let _pages: (NavPage | Folder)[] | null = pages;
         function _setPages(p: (NavPage | Folder)[]) {
             _pages = p;
             setPages(p);
         }
         const [pageDict, setPageDict]: [any, any] = useState(null)
 
-        if ((props.pages.length != pages.length && pages.length == 0) || resetState) {
+        console.log(pages);
+        if ((pages == null || prevPgsLen != props.pages.length) || resetState) {
             let pgs: (NavPage | Folder)[] = []
 
             let folderid = lastFolderID;
@@ -165,15 +167,18 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
             });
             setLastFolderID(folderid);
             setPages(pgs);
+            setprevPgsLen(props.pages.length);
             if (resetState) setResetState(false)
         }
+
+        if (pages == null) return null;
 
         if (pageDict == null && pages.length != 0)
             updatePageDict();
 
         function updatePageDict() {
             let d: any = {};
-            pages.forEach(p => {
+            pages!.forEach(p => {
                 d[p.id] = p;
                 if ((p as Folder).pages != null) {
                     (p as NavPageFolder).pages.forEach(_p => {
@@ -335,8 +340,7 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                                 }}
                                 ref={(e: any) => { if (e != null) e.sortable.options.disabled = !editing }}
                                 onChange={(order: any, sortable: any, evt: any) => {
-                                    console.log(order)
-                                    _setPages(_pages.map(e => {
+                                    _setPages(_pages!.map(e => {
                                         if (e.id == props.folder.id) {
                                             (e as Folder).pages = getPageList(order);
                                         }
@@ -380,23 +384,28 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                         disabled: !editing
                     }}
                     onChange={(order: any, sortable: any, evt: any) => {
-                        console.log('parent', order, getPageList(order))
                         _setPages(getPageList(order));
                     }}
                     ref={(e: any) => { if (e != null) e.sortable.options.disabled = !editing }}
                 >
-                    {_pages.map((p, i) => {
+                    {_pages!.map((p, i) => {
                         if ((p as Folder).pages == null) {
                             return (
                                 <div key={i} data-id={(p as NavPage).id}>
-                                    <EditableNavLink editing={editing} onDelete={() => { pages.splice(i, 1); setPages(pages.map((e: any) => e)); }} link={p as NavPage} />
+                                    <EditableNavLink editing={editing} onDelete={() => {
+                                        pages.splice(i, 1);
+                                        setPages(pages.map((e: any) => e));
+                                    }} link={p as NavPage} />
                                 </div>
                             )
                         }
                         else {
                             return (
                                 <div key={i} data-id={p.id} className="folder">
-                                    <EditableNavLinkFolder editing={editing} onDelete={() => { pages.splice(i, 1, ...(p as Folder).pages); setPages(pages.map((e: any) => e)); }} id={i} folder={p as Folder}></EditableNavLinkFolder>
+                                    <EditableNavLinkFolder editing={editing} onDelete={() => {
+                                        pages.splice(i, 1, ...(p as Folder).pages);
+                                        setPages(pages.map((e: any) => e));
+                                    }} id={i} folder={p as Folder} />
                                 </div>
                             )
                         }
@@ -449,11 +458,6 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
 
     renderMainView() {
         return (
-            //<Router>
-            //    <Route render={(location: any) => {
-            //		console.log('router 2 render', location);
-            //        location = location.location;
-            //        return (
             <div className="main">
                 <div className={`left-nav ${this.state.navHidden ? '' : 'nav-open'}`}>
                     <div className="nav-header">
@@ -499,19 +503,18 @@ export class Course extends Component<CourseProps, CourseStatePrivate> {
                                 classNames="fade"
                                 timeout={400}
                             >
-                                <div>
-                                    <Route exact path={`${this.props.match.url}/`} component={this.OpenFirstPage} />
-                                    <Route path={`${this.props.match.url}/:pageid`} component={this.PageFeeder} />
-                                    <Route render={(p) => (<div>Not Found</div>)} />
+                                <div style={{height: "100%"}}>
+                                    <Switch>
+                                        <Route exact path={`${this.props.match.url}/`} component={this.OpenFirstPage} />
+                                        <Route path={`${this.props.match.url}/:pageid`} component={this.PageFeeder} />
+                                        <Route render={(p) => (<div>Not Found</div>)} />
+                                    </Switch>
                                 </div>
                             </CSSTransition>
                         </TransitionGroup>
                     </div>
                 </div>
             </div>
-            //            )
-            //        }} />
-            //    </Router>
         )
     }
 

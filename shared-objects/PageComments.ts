@@ -2,11 +2,11 @@ export interface PageComments {
     comments?: {
         id: string,
         author: string,
-        time: Date,
+        time: string,
         replies: {
             id: string,
             author: string,
-            time: Date,
+            time: string,
         }[]
     }[]
 }

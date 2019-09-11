@@ -22,7 +22,7 @@ export class Comments {
             likes: [],
             ownerPage: pid,
             replies: [],
-            time: new Date()
+            time: new Date().toString()
         }
         DB.Comments.push(comment);
         Pages.getPage(pid).comments.push(id);
@@ -39,7 +39,7 @@ export class Comments {
             likes: [],
             ownerPage: pid,
             replies: [],
-            time: new Date()
+            time: new Date().toString()
         }
         DB.Comments.push(reply);
         Comments.getComment(cid).replies.push(id);

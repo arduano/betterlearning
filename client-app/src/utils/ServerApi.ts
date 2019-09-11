@@ -48,6 +48,12 @@ export class WebApi {
         return response.data as PageData;
     }
 
+    async updatePage(cid: string, data: string) {
+        let response = await axios.patch(WebApi.urlBase + `api1/page/${cid}`, { data: data }, { headers: this.getAuthHeaders() });
+        console.log(response);
+        return;
+    }
+
     async getComments(pid: string) {
         let response = await axios.get(WebApi.urlBase + `api1/comments/${pid}`, { headers: this.getAuthHeaders() });
         return response.data as PageComments;
@@ -91,5 +97,5 @@ export class WebApi {
     async modifyCourse(cid: string, data: ModifyCourseData) {
         let response = await axios.post(WebApi.urlBase + `api1/nav/${cid}`, data, { headers: this.getAuthHeaders() });
         return response.data as CourseState;
-    } 
+    }
 }

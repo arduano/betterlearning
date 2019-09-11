@@ -1,4 +1,11 @@
-.compose-page .ql-snow, .compose-comment .ql-snow {
+.ql-editor {
+    color: white;
+    font-family: "Open Sans";
+    font-size: 16px;
+}
+
+.compose-page .ql-snow,
+.compose-comment .ql-snow {
     .ql-editor {
         color: white;
         font-family: "Open Sans";
@@ -30,7 +37,7 @@
     border-right: none;
 }
 
-.compose-page .ql-toolbar.ql-snow{
+.compose-page .ql-toolbar.ql-snow {
     border-top: none;
 }
 
@@ -38,7 +45,8 @@
     background-color: #0003;
 }
 
-.compose-page, .compose-comment {
+.compose-page,
+.compose-comment {
     .post-button {
         background-color: #111;
         border: none;
@@ -79,7 +87,7 @@
     }
 }
 
-.ql-font.ql-picker{
+.ql-font.ql-picker {
     width: 150px !important;
 }
 

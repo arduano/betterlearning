@@ -25,7 +25,7 @@ const port = 8080;
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH');
     next();
 });
 app.use(express.json())
@@ -57,6 +57,7 @@ app.get('/api1/course/:id', m.auth, (req, res) => {
 //Returns { token: string }
 app.post('/api1/login', (req, res) => {
     let token = Authentication.passwordLogin(req.body.name, req.body.pass);
+    console.log(JSON.stringify(DB));
     if (token != null)
         res.status(200).send({ token });
     else
@@ -89,6 +90,13 @@ app.get('/api1/page/:cid/:pid', m.auth, (req, res) => {
 app.post('/api1/page/:cid', m.auth, m.course('cid', true), (req, res) => {
     let page = Pages.createPage(reqCourse(req).id);
     res.status(200).send(page);
+})
+
+//Takes course id
+//Makes new page, Returns PageData
+app.patch('/api1/page/:pid', m.auth, m.page('pid', true), (req, res) => {
+    Pages.updatePage(reqPage(req).id, req.body.data);
+    res.status(200);
 })
 
 //Takes page id

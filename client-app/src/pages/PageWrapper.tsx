@@ -94,10 +94,10 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData>, admi
                 let comments = null;
 
                 if (this.state.comments != null) {
-                    comments = this.state.comments.sort((a, b) => (new Date(b.time).getTime() - new Date(a.time).getTime())).map((c, i) => {
+                    comments = this.state.comments.sort((a, b) => (-new Date(b.time).getTime() + new Date(a.time).getTime())).map((c, i) => {
                         if (this.state.data != null) {
                             return (
-                                <CommentComponent comment={c} isReply={false} pid={this.state.data.id} key={this.state.comments!.length - i} />
+                                <CommentComponent comment={c} isReply={false} pid={this.state.data.id} key={i} />
                             )
                         }
                     });
@@ -108,7 +108,10 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData>, admi
                         <div>
                             {page}
                         </div>
-                        <button className="edit-page-button" onClick={() => this.setState({ editing: !this.state.editing })}>{this.state.editing ? 'Save' : 'Edit'}</button>
+                        <button className="edit-page-button" onClick={() => {
+                            if (this.state.editing) new WebApi().updatePage(this.state.data!.id, this.state.data!.data.html)
+                            this.setState({ editing: !this.state.editing })
+                        }}>{this.state.editing ? 'Save' : 'Edit'}</button>
                         {this.state.comments != undefined && (
                             <div>
                                 <CommentComposer isReply={false} pid={this.state.data.id} posted={(c) => {
@@ -116,7 +119,7 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData>, admi
                                         author: c.author,
                                         id: c.id,
                                         replies: [],
-                                        time: new Date(c.time)
+                                        time: c.time
                                     });
                                     this.reloadComments();
                                 }} />
@@ -135,11 +138,11 @@ export class PageWrapper extends React.Component<{ data: Promise<PageData>, admi
 type BasicCommentProps = {
     id: string,
     author: string,
-    time: Date,
+    time: string,
     replies?: {
         id: string,
         author: string,
-        time: Date,
+        time: string,
     }[]
 }
 
@@ -195,9 +198,9 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean,
 
     let replies = undefined;
     if (props.comment.replies != null) {
-        replies = props.comment.replies.sort((a, b) => (new Date(b.time).getTime() - new Date(a.time).getTime())).map((r, i) => {
+        replies = props.comment.replies.sort((a, b) => (-new Date(b.time).getTime() + new Date(a.time).getTime())).map((r, i) => {
             return (
-                <CommentComponent comment={r} pid={props.pid} isReply={true} key={props.comment.replies!.length - i} />
+                <CommentComponent comment={r} pid={props.pid} isReply={true} key={i} />
             )
         });
     }
@@ -211,7 +214,7 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean,
                 <div className="comment-content">
                     <div className="comment-user">
                         {author != null && author.name}
-                        <span className="comment-date"> - {getDateString(props.comment.time)}</span>
+                        <span className="comment-date"> - {getDateString(new Date(props.comment.time))}</span>
                     </div>
                     <div ref={(e: HTMLDivElement) => { if (comment != null && e != null) e.innerHTML = comment.content }}>
                     </div>
@@ -237,7 +240,7 @@ function CommentComponent(props: { comment: BasicCommentProps, isReply: boolean,
                                         props.comment.replies!.push({
                                             author: r.author,
                                             id: r.id,
-                                            time: new Date(r.time)
+                                            time: r.time
                                         });
                                         setReplying(false);
                                     }

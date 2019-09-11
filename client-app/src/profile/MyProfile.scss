@@ -244,11 +244,11 @@ $transition-fade-height: 50px;
         .loader {
             animation-name: spin;
             animation-duration: 1.2s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
             border-radius: 100%;
             border: 2px solid black;
             border-color: black black black transparent;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
             position: absolute;
             margin: auto;
             width: 12px;
